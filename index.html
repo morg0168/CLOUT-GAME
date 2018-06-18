@@ -11,8 +11,8 @@
     }
     canvas {
       position:absolute;
-      width:100vw;
-      height:100vh;
+      /* width:100vw;
+      height:100vh; */
     }
     </style>
   </head>
@@ -75,44 +75,64 @@ class Person {
       this._container.position.y = y;
       this._body = PIXI.Sprite.fromImage('Character_Standing.png');
       this._body.anchor.x = 0.5;
-      this._body.anchor.y - 0.5;
+      this._body.anchor.y = -0.25;
       this._body.scale.x = 1;
       this._body.scale.y = 1;
       this._container.addChild(this._body);
       this._game.stage.addChild(this._container);
+      console.log(this._container.position.x);
+      console.log(this._container.position.y);
+      this._originalY = this._container.position.y;
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
-      var dtLeftY = this._container.position.y;
       var newSpot = (dtLeftX - 45);
-      new Tween(this, "_container.position.x", newSpot, 10, true);
+      var maxLeftX = (GameStage.renderer.width / 2) - 150;
+      var playerHalfWidth = this._body.width / 2;
+
+      if (newSpot <= maxLeftX) {
+        var newmaxLeft = maxLeftX + playerHalfWidth;
+        new Tween(this, "_container.position.x", newmaxLeft, 10, true);
+      } else {
+          new Tween(this, "_container.position.x", newSpot, 10, true);
+      }
     }
     moveRight() {
       var dtLeftX = this._container.position.x;
-      var dtLeftY = this._container.position.y;
       var newSpot = (dtLeftX + 45);
-      new Tween(this, "_container.position.x", newSpot, 10, true);
+      var maxLeftX = (GameStage.renderer.width / 2) + 150;
+      var playerHalfWidth = this._body.width / 2;
+
+      if (newSpot >= maxLeftX) {
+        var newmaxLeft = maxLeftX - playerHalfWidth;
+          new Tween(this, "_container.position.x", newmaxLeft, 10, true);
+      } else {
+            new Tween(this, "_container.position.x", newSpot, 10, true);
+      }
     }
     moveUp() {
-      var dtLeftX = this._container.position.x;
       var dtLeftY = this._container.position.y;
-      var newSpot = (dtLeftY - 45);
-      new Tween(this, "_container.position.y", newSpot, 10, true);
+      var newSpot = (dtLeftY - 25);
+      new Tween(this, "_container.position.y", this._originalY, 10, true);
     }
     moveDown() {
-      var dtLeftX = this._container.position.x;
       var dtLeftY = this._container.position.y;
-      var newSpot = (dtLeftY + 45);
-      new Tween(this, "_container.position.y", newSpot, 10, true);
+      var newSpot = (dtLeftY + 25);
+      var orig = (this._originalY + 25);
+      new Tween(this, "_container.position.y", orig, 10, true);
     }
     stan() {
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      this._body.anchor.x = 0.5;
+      this._body.anchor.y = -0.25;
       this._container.addChild(this._body);
     }
     duck() {
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Duck.png');
+      this._body.anchor.x = 0.5;
+      this._body.anchor.y = -0.25;
       this._container.addChild(this._body);
     }
     // checkHit(bulletPosition) {
@@ -188,7 +208,6 @@ class Loader {
   let GameStage = new Game(document.body);
   var bg = new PIXI.Sprite.fromImage('Landscape.png');
         bg.anchor.set(0.5);
-        bg.scale.set(0.5);
         bg.position.set(GameStage.renderer.view.width/2, GameStage.renderer.view.height/2);
         bg.scale.x = 1;
         bg.scale.y = 1;
