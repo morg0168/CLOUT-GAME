@@ -51,12 +51,18 @@ window.addEventListener('keydown', function(event) {
           break;
       case 16: // Shift (duck)
         GameStage.person.duck();
+        break;
+      case 32:
+        GameStage.person.jump();
           //mainCharacter.duck();
     }
 });
 window.addEventListener('keyup', function(event) {
   switch (event.keyCode) {
     case 16:
+      GameStage.person.stan();
+    break;
+    case 32:
       GameStage.person.stan();
       // mainCharacter.stan();
   }
@@ -135,6 +141,13 @@ class Person {
       this._body.anchor.y = -0.25;
       this._container.addChild(this._body);
     }
+    jump() {
+      this._container.removeChild(this._body);
+      this._body = PIXI.Sprite.fromImage('Character_Jump.png');
+      this._body.anchor.x = 0.5;
+      this._body.anchor.y = 0.25;
+      this._container.addChild(this._body);
+    }
     // checkHit(bulletPosition) {
     //   if (this._body.containsPoint(bulletPosition)) {
     //     return true;
@@ -191,6 +204,7 @@ class Loader {
       this._assetLoader = new PIXI.loaders.Loader();
       this._assetLoader.add('Character_Duck.png');
       this._assetLoader.add('Character_Standing.png');
+      this._assetLoader.add('Character_Jump.png');
       this._assetLoader.add('Cloud.png');
       this._assetLoader.add('Landscape.png');
       this._assetLoader.once('complete', this._onImagesLoaded.bind(this));
