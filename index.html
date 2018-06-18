@@ -78,28 +78,32 @@ class Person {
       this._body.anchor.y - 0.5;
       this._body.scale.x = 1;
       this._body.scale.y = 1;
-      this._body.position.x = 0;
-      this._body.position.y = 0;
       this._container.addChild(this._body);
       this._game.stage.addChild(this._container);
-      Game.person = this._body;
     }
     moveLeft() {
-      var dtX = this._container.position.x;
-      var dtY = this._container.position.y;
-      console.log(dtX);
-      console.log(dtY);
-      new Tween(this, "_body.position.x", dtX, 10, true);
-      //this._container.position.x -= 25
+      var dtLeftX = this._container.position.x;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftX - 45);
+      new Tween(this, "_container.position.x", newSpot, 10, true);
     }
     moveRight() {
-      this._container.position.x += 25
+      var dtLeftX = this._container.position.x;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftX + 45);
+      new Tween(this, "_container.position.x", newSpot, 10, true);
     }
     moveUp() {
-      this._container.position.y -= 25
+      var dtLeftX = this._container.position.x;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftY - 45);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
     }
     moveDown() {
-      this._container.position.y += 25
+      var dtLeftX = this._container.position.x;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftY + 45);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
     }
     stan() {
       this._container.removeChild(this._body);
@@ -142,14 +146,10 @@ class Game {
     //Comment back in for random positioning
     // var x = this.renderer.width * (0.1 + Math.random() * 0.8);
     // var y = this.renderer.height *(0.1 * Math.random() * 0.8);
+    let x = GameStage.renderer.width / 2;
+    let y = GameStage.renderer.height / 2;
     this.person = new Person(this, x , y);
   }
-  //
-  // player() {
-  //   //if (this.person !== null) {
-  //     return this.person
-  //   //}
-  // }
 
   removePlayer() {
     this.person = null
@@ -193,9 +193,9 @@ class Loader {
         bg.scale.x = 1;
         bg.scale.y = 1;
         GameStage.stage.addChild(bg);
-  let x = GameStage.renderer.width / 2;
-  let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
-  GameStage.addPerson(GameStage, x, y);
+  //let x = GameStage.renderer.width / 2;
+  //let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
+  GameStage.addPerson();
 
 
 
