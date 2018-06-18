@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>clout2</title>
+    <style>
+    body {
+      margin:0;
+      padding:0;
+    }
+    canvas {
+      position:absolute;
+      width:100vw;
+      height:100vh;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenLite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenMax.min.js"></script>
+      <script src="tween.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+  </body>
+</html>
+
+
+<script>
+
+
+window.addEventListener('keydown', function(event) {
+    switch (event.keyCode) {
+      case 37: //Left
+        GameStage.person.moveLeft();
+        //  mainCharacter.moveLeft();
+        break;
+      case 38: //up
+        GameStage.person.moveUp();
+        //  mainCharacter.moveUp();
+        break;
+      case 39: //Right
+        GameStage.person.moveRight();
+        //  mainCharacter.moveRight();
+        break;
+      case 40: //Down. TODO : Confirm
+        GameStage.person.moveDown();
+        //  mainCharacter.moveDown();
+          break;
+      case 16: // Shift (duck)
+        GameStage.person.duck();
+          //mainCharacter.duck();
+    }
+});
+window.addEventListener('keyup', function(event) {
+  switch (event.keyCode) {
+    case 16:
+      GameStage.person.stan();
+      // mainCharacter.stan();
+  }
+});
+
+
+  //  PERSON
+class Person {
+    constructor(game, x, y) {
+      this._game = game;
+      this._isDestroyed = false;
+      this._speed = 0;
+      //this._health = MAX_HEALTH;
+      this._container = new PIXI.Container();
+      this._container.position.x = x;
+      this._container.position.y = y;
+      this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      this._body.anchor.x = 0.5;
+      this._body.anchor.y - 0.5;
+      this._body.scale.x = 1;
+      this._body.scale.y = 1;
+      this._body.position.x = 0;
+      this._body.position.y = 0;
+      this._container.addChild(this._body);
+      this._game.stage.addChild(this._container);
+      Game.person = this._body;
+    }
+    moveLeft() {
+      var dtX = this._container.position.x;
+      var dtY = this._container.position.y;
+      console.log(dtX);
+      console.log(dtY);
+      new Tween(this, "_body.position.x", dtX, 10, true);
+      //this._container.position.x -= 25
+    }
+    moveRight() {
+      this._container.position.x += 25
+    }
+    moveUp() {
+      this._container.position.y -= 25
+    }
+    moveDown() {
+      this._container.position.y += 25
+    }
+    stan() {
+      this._container.removeChild(this._body);
+      this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      this._container.addChild(this._body);
+    }
+    duck() {
+      this._container.removeChild(this._body);
+      this._body = PIXI.Sprite.fromImage('Character_Duck.png');
+      this._container.addChild(this._body);
+    }
+    // checkHit(bulletPosition) {
+    //   if (this._body.containsPoint(bulletPosition)) {
+    //     return true;
+    //   }
+    //   return false
+    // }
+    remove() {
+      this._game.stage.removeChild(this._container);
+    }
+  }
+
+//GAME
+//
+//class Game extends EventEmitter{
+class Game {
+  constructor(element) {
+    //super();
+    this._element = element;
+    this.person = null;
+    this.stage = new PIXI.Container();
+    this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
+    this._element.appendChild(this.renderer.view);
+    this._lastFrameTime = 0;
+    //this.bullettracker = new Bullettracker(this, 200);
+    requestAnimationFrame(this._tick.bind(this));
+  }
+
+  addPerson() {
+    //Comment back in for random positioning
+    // var x = this.renderer.width * (0.1 + Math.random() * 0.8);
+    // var y = this.renderer.height *(0.1 * Math.random() * 0.8);
+    this.person = new Person(this, x , y);
+  }
+  //
+  // player() {
+  //   //if (this.person !== null) {
+  //     return this.person
+  //   //}
+  // }
+
+  removePlayer() {
+    this.person = null
+  }
+
+  _tick(currentTime) {
+    //this.emit('update', currentTime - this._lastFrameTime, currentTime);
+    this._lastFrameTime = currentTime;
+    this.renderer.render(this.stage);
+    Tween.runTweens();
+    requestAnimationFrame(this._tick.bind(this));
+  }
+}
+
+//  Loader
+class Loader {
+    constructor() {
+      this._callback = null;
+      this._assetLoader = new PIXI.loaders.Loader();
+      this._assetLoader.add('Character_Duck.png');
+      this._assetLoader.add('Character_Standing.png');
+      this._assetLoader.add('Cloud.png');
+      this._assetLoader.add('Landscape.png');
+      this._assetLoader.once('complete', this._onImagesLoaded.bind(this));
+    }
+    load(callback) {
+      this._callback = callback;
+      this._assetLoader.load();
+    }
+
+    _onImagesLoaded() {
+      this._callback();
+    }
+}
+
+  let GameStage = new Game(document.body);
+  var bg = new PIXI.Sprite.fromImage('Landscape.png');
+        bg.anchor.set(0.5);
+        bg.scale.set(0.5);
+        bg.position.set(GameStage.renderer.view.width/2, GameStage.renderer.view.height/2);
+        bg.scale.x = 1;
+        bg.scale.y = 1;
+        GameStage.stage.addChild(bg);
+  let x = GameStage.renderer.width / 2;
+  let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
+  GameStage.addPerson(GameStage, x, y);
+
+
+
+</script>
