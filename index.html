@@ -89,24 +89,27 @@
       this._container.position.x = x;
       this._container.position.y = y;
       this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      // this._container.width = this._body.width;
       this._body.anchor.x = 0.5;
       this._body.anchor.y = -0.25;
       this._body.scale.x = 1;
       this._body.scale.y = 1;
       this._container.addChild(this._body);
       this._game.stage.addChild(this._container);
-      this.r = 50;
-      // console.log(this._container.position.x);
-      // console.log(this._container.position.y);
+
+      this._container.width = this._body.width;
+      this._container.height = this._body.height;
+
       this._originalY = this._container.position.y;
-      this._intersects = function(other) {
-        var d = dist(this.x, this.y, other.x, other.y);
-        if (d < this.r + other.r) {
-          return true
-        } else {
-          return false
-        }
-      }
+      //console.log(this.);
+      // this._intersects = function(other) {
+      //   var d = dist(this.x, this.y, other.x, other.y);
+      //   if (d < this.r + other.r) {
+      //     return true
+      //   } else {
+      //     return false
+      //   }
+      // }
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
@@ -205,7 +208,6 @@
           let x = spacing * i + xOffset;
           let bullet = new PIXI.Container();
           let y = this._stagger();
-          console.log(y);
           this._addSpriteBody();
           bullet.addChild(this._body);
           bullet.position.x = x;
@@ -219,7 +221,7 @@
       }
     //  this._bullets = bullets;
       this.rain = function() {
-        console.log(this._first);
+      //  console.log(this._first);
         this._bullets.forEach(function(bullet) {
           if (bullet.position.y > GameStage.renderer.height) {
             // bullet.position.y = 0;
@@ -231,10 +233,11 @@
         });
       }
       this.testCollision = function() {
+        //console.log(GameStage.person);
         this._bullets.forEach(function(bullet) {
-          if (hitTestRectangle(GameStage.bullettracker, GameStage.person)) {
+          if (hitTestRectangle(bullet, GameStage.person._container)) {
             //There's a collision
-            alert('collision');
+            console.log('collision');
           } else {
             //There's no collision
             //console.log('no collision');
@@ -257,8 +260,7 @@
       this._element.appendChild(this.renderer.view);
       this._lastFrameTime = 0;
       //this.bullettracker = new Bullettracker(this, 200);
-      this.bullettracker = new Bullettracker(this);
-      this.bullettracker.render();
+
       requestAnimationFrame(this._tick.bind(this));
     }
 
@@ -269,6 +271,10 @@
       let x = GameStage.renderer.width / 2;
       let y = GameStage.renderer.height / 2;
       this.person = new Person(this, x, y);
+    }
+    addBullets() {
+      this.bullettracker = new Bullettracker(this);
+      this.bullettracker.render();
     }
 
     removePlayer() {
@@ -281,12 +287,8 @@
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
-      GameStage.bullettracker.rain();
-      GameStage.bullettracker.testCollision();
-
-      //MOVE OUT OF RENDER FUNCTION
-
-
+      this.bullettracker.rain();
+      this.bullettracker.testCollision();
     }
   }
 
@@ -322,6 +324,7 @@
   //let x = GameStage.renderer.width / 2;
   //let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
   GameStage.addPerson();
+  GameStage.addBullets();
 
 
   //HELPER COLLISION DETECTION FUNCTION
@@ -332,12 +335,13 @@
 
     //hit will determine whether there's a collision
     hit = false;
-
     //Find the center points of each sprite
     r1.centerX = r1.x + r1.width / 2;
     r1.centerY = r1.y + r1.height / 2;
     r2.centerX = r2.x + r2.width / 2;
     r2.centerY = r2.y + r2.height / 2;
+
+    //console.log(r2);
 
     //Find the half-widths and half-heights of each sprite
     r1.halfWidth = r1.width / 2;
