@@ -1,37 +1,46 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>clout2</title>
-    <style>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>clout2</title>
+  <style>
     body {
-      margin:0;
-      padding:0;
+      margin: 0;
+      padding: 0;
     }
+
     canvas {
-      position:absolute;
+      position: absolute;
       /* width:100vw;
       height:100vh; */
     }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenLite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenMax.min.js"></script>
-      <script src="tween.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
-  </body>
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenLite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenMax.min.js"></script>
+  <script src="tween.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+</body>
+
 </html>
 
 
 <script>
+  function random(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  }
 
 
-window.addEventListener('keydown', function(event) {
+  window.addEventListener('keydown', function(event) {
     switch (event.keyCode) {
       case 37: //Left
         GameStage.person.moveLeft();
@@ -48,29 +57,29 @@ window.addEventListener('keydown', function(event) {
       case 40: //Down. TODO : Confirm
         GameStage.person.moveDown();
         //  mainCharacter.moveDown();
-          break;
+        break;
       case 16: // Shift (duck)
         GameStage.person.duck();
         break;
       case 32:
         GameStage.person.jump();
-          //mainCharacter.duck();
+        //mainCharacter.duck();
     }
-});
-window.addEventListener('keyup', function(event) {
-  switch (event.keyCode) {
-    case 16:
-      GameStage.person.stan();
-    break;
-    case 32:
-      GameStage.person.stan();
-      // mainCharacter.stan();
-  }
-});
+  });
+  window.addEventListener('keyup', function(event) {
+    switch (event.keyCode) {
+      case 16:
+        GameStage.person.stan();
+        break;
+      case 32:
+        GameStage.person.stan();
+        // mainCharacter.stan();
+    }
+  });
 
 
   //  PERSON
-class Person {
+  class Person {
     constructor(game, x, y) {
       this._game = game;
       this._isDestroyed = false;
@@ -86,9 +95,18 @@ class Person {
       this._body.scale.y = 1;
       this._container.addChild(this._body);
       this._game.stage.addChild(this._container);
-      console.log(this._container.position.x);
-      console.log(this._container.position.y);
+      this.r = 50;
+      // console.log(this._container.position.x);
+      // console.log(this._container.position.y);
       this._originalY = this._container.position.y;
+      this._intersects = function(other) {
+        var d = dist(this.x, this.y, other.x, other.y);
+        if (d < this.r + other.r) {
+          return true
+        } else {
+          return false
+        }
+      }
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
@@ -100,7 +118,7 @@ class Person {
         var newmaxLeft = maxLeftX + playerHalfWidth;
         new Tween(this, "_container.position.x", newmaxLeft, 10, true);
       } else {
-          new Tween(this, "_container.position.x", newSpot, 10, true);
+        new Tween(this, "_container.position.x", newSpot, 10, true);
       }
     }
     moveRight() {
@@ -111,9 +129,9 @@ class Person {
 
       if (newSpot >= maxLeftX) {
         var newmaxLeft = maxLeftX - playerHalfWidth;
-          new Tween(this, "_container.position.x", newmaxLeft, 10, true);
+        new Tween(this, "_container.position.x", newmaxLeft, 10, true);
       } else {
-            new Tween(this, "_container.position.x", newSpot, 10, true);
+        new Tween(this, "_container.position.x", newSpot, 10, true);
       }
     }
     moveUp() {
@@ -159,54 +177,129 @@ class Person {
     }
   }
 
-//GAME
-//
-//class Game extends EventEmitter{
-class Game {
-  constructor(element) {
-    //super();
-    this._element = element;
-    this.person = null;
-    this.stage = new PIXI.Container();
-    this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
-    this._element.appendChild(this.renderer.view);
-    this._lastFrameTime = 0;
-    //this.bullettracker = new Bullettracker(this, 200);
-    requestAnimationFrame(this._tick.bind(this));
+  //BULLETS
+  class Bullettracker {
+
+    constructor(game) {
+      this._game = game;
+      this._isDestroyed = false;
+      this._speed = 0;
+      this._first;
+      this._bullets = [];
+      this._addSpriteBody = function() {
+        this._body = PIXI.Sprite.fromImage('bullet.png');
+      }
+      this._stagger = function() {
+        return random(0, this._game.renderer.height)
+      }
+      this.render = function() {
+        let numberOfBullets = 6,
+          spacing = 48,
+          xOffset = this._game.renderer.width / 2,
+          speed = 2,
+          direction = 1;
+        let bullets = [];
+        this._first = false;
+
+        for (let i = 0; i < numberOfBullets; i++) {
+          let x = spacing * i + xOffset;
+          let bullet = new PIXI.Container();
+          let y = this._stagger();
+          console.log(y);
+          this._addSpriteBody();
+          bullet.addChild(this._body);
+          bullet.position.x = x;
+          bullet.position.y = y;
+          bullet.vy = speed * direction;
+          direction *= -1;
+          bullets.push(bullet);
+          this._game.stage.addChild(bullet);
+        }
+        this._bullets = bullets;
+      }
+    //  this._bullets = bullets;
+      this.rain = function() {
+        console.log(this._first);
+        this._bullets.forEach(function(bullet) {
+          if (bullet.position.y > GameStage.renderer.height) {
+            // bullet.position.y = 0;
+            bullet.position.y = 0 - GameStage.bullettracker._stagger();
+          } else {
+            bullet.position.y += 1
+          }
+        //  bullet.position.y = (bullet.position.y > GameStage.renderer.height) ? 0 : bullet.position.y += 1;
+        });
+      }
+      this.testCollision = function() {
+        this._bullets.forEach(function(bullet) {
+          if (hitTestRectangle(GameStage.bullettracker, GameStage.person)) {
+            //There's a collision
+            alert('collision');
+          } else {
+            //There's no collision
+            //console.log('no collision');
+          }
+        });
+      }
+    }
   }
 
-  addPerson() {
-    //Comment back in for random positioning
-    // var x = this.renderer.width * (0.1 + Math.random() * 0.8);
-    // var y = this.renderer.height *(0.1 * Math.random() * 0.8);
-    let x = GameStage.renderer.width / 2;
-    let y = GameStage.renderer.height / 2;
-    this.person = new Person(this, x , y);
+  //GAME
+  //
+  //class Game extends EventEmitter{
+  class Game {
+    constructor(element) {
+      //super();
+      this._element = element;
+      this.person = null;
+      this.stage = new PIXI.Container();
+      this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
+      this._element.appendChild(this.renderer.view);
+      this._lastFrameTime = 0;
+      //this.bullettracker = new Bullettracker(this, 200);
+      this.bullettracker = new Bullettracker(this);
+      this.bullettracker.render();
+      requestAnimationFrame(this._tick.bind(this));
+    }
+
+    addPerson() {
+      //Comment back in for random positioning
+      // var x = this.renderer.width * (0.1 + Math.random() * 0.8);
+      // var y = this.renderer.height *(0.1 * Math.random() * 0.8);
+      let x = GameStage.renderer.width / 2;
+      let y = GameStage.renderer.height / 2;
+      this.person = new Person(this, x, y);
+    }
+
+    removePlayer() {
+      this.person = null
+    }
+
+    _tick(currentTime) {
+      //this.emit('update', currentTime - this._lastFrameTime, currentTime);
+      this._lastFrameTime = currentTime;
+      this.renderer.render(this.stage);
+      Tween.runTweens();
+      requestAnimationFrame(this._tick.bind(this));
+      GameStage.bullettracker.rain();
+      GameStage.bullettracker.testCollision();
+
+      //MOVE OUT OF RENDER FUNCTION
+
+
+    }
   }
 
-  removePlayer() {
-    this.person = null
-  }
-
-  _tick(currentTime) {
-    //this.emit('update', currentTime - this._lastFrameTime, currentTime);
-    this._lastFrameTime = currentTime;
-    this.renderer.render(this.stage);
-    Tween.runTweens();
-    requestAnimationFrame(this._tick.bind(this));
-  }
-}
-
-//  Loader
-class Loader {
+  //  Loader
+  class Loader {
     constructor() {
       this._callback = null;
       this._assetLoader = new PIXI.loaders.Loader();
       this._assetLoader.add('Character_Duck.png');
       this._assetLoader.add('Character_Standing.png');
       this._assetLoader.add('Character_Jump.png');
-      this._assetLoader.add('Cloud.png');
       this._assetLoader.add('Landscape.png');
+      this._assetLoader.add('bullet.png');
       this._assetLoader.once('complete', this._onImagesLoaded.bind(this));
     }
     load(callback) {
@@ -217,19 +310,69 @@ class Loader {
     _onImagesLoaded() {
       this._callback();
     }
-}
+  }
 
   let GameStage = new Game(document.body);
   var bg = new PIXI.Sprite.fromImage('Landscape.png');
-        bg.anchor.set(0.5);
-        bg.position.set(GameStage.renderer.view.width/2, GameStage.renderer.view.height/2);
-        bg.scale.x = 1;
-        bg.scale.y = 1;
-        GameStage.stage.addChild(bg);
+  bg.anchor.set(0.5);
+  bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+  bg.scale.x = 1;
+  bg.scale.y = 1;
+  GameStage.stage.addChild(bg);
   //let x = GameStage.renderer.width / 2;
   //let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
   GameStage.addPerson();
 
 
+  //HELPER COLLISION DETECTION FUNCTION
+  function hitTestRectangle(r1, r2) {
 
+    //Define the variables we'll need to calculate
+    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    r1.centerX = r1.x + r1.width / 2;
+    r1.centerY = r1.y + r1.height / 2;
+    r2.centerX = r2.x + r2.width / 2;
+    r2.centerY = r2.y + r2.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    r1.halfWidth = r1.width / 2;
+    r1.halfHeight = r1.height / 2;
+    r2.halfWidth = r2.width / 2;
+    r2.halfHeight = r2.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+
+      //A collision might be occuring. Check for a collision on the y axis
+      if (Math.abs(vy) < combinedHalfHeights) {
+
+        //There's definitely a collision happening
+        hit = true;
+      } else {
+
+        //There's no collision on the y axis
+        hit = false;
+      }
+    } else {
+
+      //There's no collision on the x axis
+      hit = false;
+    }
+
+    //`hit` will be either `true` or `false`
+    return hit;
+  };
 </script>
