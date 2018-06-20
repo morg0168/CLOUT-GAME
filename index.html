@@ -163,7 +163,7 @@
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Duck.png');
       this._body.anchor.x = 0.5;
-      this._body.anchor.y = -0.25;
+      this._body.anchor.y = -0.45;
       this._container.addChild(this._body);
     }
     jump() {
@@ -216,13 +216,13 @@
         this._addSpriteBody(spriteNumber);
 
         bullet.addChild(this._body);
-        console.log(landingRandom);
+        // console.log(landingRandom);
         bullet._landingPos = this._landingPositions[landingRandom];
         bullet.position.x = randomX;
         bullet.position.y = y;
         bullet.vy = speed * direction;
         bullet.rotated = false;
-        direction *= -1;
+         direction *= -1;
         this._game.stage.addChild(bullet);
         this._game.bulletArray.push(bullet);
       }
