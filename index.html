@@ -191,9 +191,7 @@
       this._isDestroyed = false;
       this._speed = 0;
       this._first;
-      // this._bullets = [];
-      this._value;
-      // this.bulletItem;
+      this._landingPositions = [35, 65, 110];
       this._addSpriteBody = function(spriteNumber) {
         var bulletImage = 'bullet' + spriteNumber + '.png';
         this._body = PIXI.Sprite.fromImage(bulletImage);
@@ -214,12 +212,16 @@
 
         let y = this._stagger();
         let spriteNumber = random(1, 4);
+        let landingRandom = random(0, 3);
         this._addSpriteBody(spriteNumber);
 
         bullet.addChild(this._body);
+        console.log(landingRandom);
+        bullet._landingPos = this._landingPositions[landingRandom];
         bullet.position.x = randomX;
         bullet.position.y = y;
         bullet.vy = speed * direction;
+        bullet.rotated = false;
         direction *= -1;
         this._game.stage.addChild(bullet);
         this._game.bulletArray.push(bullet);
@@ -232,73 +234,42 @@
         GameStage.stage.removeChild(bullet);
         //GameStage.bulletArray.shift();
       }
-      // this.render = function() {
-      //   let numberOfBullets = 3,
-      //     spacing = 48,
-      //     xOffset = this._game.renderer.width / 2,
-      //     speed = 2,
-      //     direction = 1;
-      //   let bullets = [];
-      //   this._first = false;
-      //
-      //   for (let i = 0; i < numberOfBullets; i++) {
-      //     let x = spacing * i + xOffset;
-      //     let bullet = new PIXI.Container();
-      //     let y = this._stagger();
-      //
-      //     let spriteNumber = random(1, 4);
-      //     //console.log(spriteNumber);
-      //     this._addSpriteBody(spriteNumber);
-      //     bullet.addChild(this._body);
-      //     bullet.position.x = x;
-      //     bullet.position.y = y;
-      //     bullet.vy = speed * direction;
-      //     direction *= -1;
-      //     bullets.push(bullet);
-      //     this._game.stage.addChild(bullet);
-      //
-      //     bullet.remove = function() {
-      //       console.log(GameStage.stage);
-      //       GameStage.stage.removeChild(bullet);
-      //     }
-      //   }
-      //   this._bullets = bullets;
-      //   this.rain();
-      // }
 
       this.rain = function() {
 
         GameStage.bulletArray.forEach(function(bullet) {
-          if (bullet.position.y > GameStage.renderer.height) {
-
-            GameStage.Bullets.remove(bullet);
-
-            var randomX = random(0, GameStage.renderer.width);
+          if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet._landingPos)) {
+            // var currentFrame =
             var switchInterval = Math.round(random(2, 2000));
             var frameCount = Math.round(GameStage._lastFrameTime);
-            // if (frameCount % switchInterval == 0) {
-            GameStage.addBullets();
-            //}
-            //bullet.position.y = 0;
+            bullet.position.y = bullet.position.y;
+            if (bullet.rotated !== true) {
+              new Tween(bullet, "rotation", -0.2, 10, true);
+              //bullet.rotation -= 0.2;
+              bullet.rotated = true;
+            }
 
+            if (frameCount % switchInterval == 0) {
+              GameStage.Bullets.remove(bullet);
+              GameStage.addBullets();
+            }
+
+            // (93, 98.5) is center of center bunny sprite in local container coordinates
+            // we want it to be in (200, 150) of global coords
+            // bullet.pivot.x = 80 + 26 * 0.5;
+            // bullet.pivot.y = 80 + 37 * 0.5;
+            //  bullet.style.transform = "rotate3d(2, -1, -1, -0.2turn)";
+            // if (frameCount % switchInterval == 0) {
+
+          } else if (bullet.position.y > GameStage.renderer.height) {
+            GameStage.Bullets.remove(bullet);
+            GameStage.addBullets();
           } else {
             bullet.position.y += 1
           }
           //  bullet.position.y = (bullet.position.y > GameStage.renderer.height) ? 0 : bullet.position.y += 1;
         });
       }
-
-      // this.rain = function() {
-      //   if (this.bulletItem.position.y > GameStage.renderer.height) {
-      //        //bullet.position.y = 0 - GameStage.Bullets._stagger();
-      //        this.remove();
-      //        var randomX = random(0, GameStage.renderer.width / 2);
-      //        this.render(randomX);
-      //        //bullet.add();
-      //      } else {
-      //        this.bulletItem.position.y += 1
-      //      }
-      // }
 
       this.testCollision = function() {
         //console.log(GameStage.person);
@@ -319,6 +290,7 @@
     //   this._game.stage.removeChild(this._container.);
     // }
   }
+
   //GAME
   //
   //class Game extends EventEmitter{
@@ -332,10 +304,12 @@
       this._element.appendChild(this.renderer.view);
       this._lastFrameTime = 0;
       this.bulletArray = [];
-
-      //this.Bullets = new Bullets(this, 200);
-
+      this.state = "";
       requestAnimationFrame(this._tick.bind(this));
+    }
+
+    addState() {
+      this.state = new State(this);
     }
 
     addPerson() {
@@ -351,7 +325,7 @@
       var y = 0;
       var numberOfBullets = 3;
       for (let i = 0; i < numberOfBullets; i++) {
-        if (GameStage.bulletArray.length <= 3) {
+        if (GameStage.bulletArray.length < 3) {
           var randomX = random(0, GameStage.renderer.width);
           this.Bullets = new Bullets(this);
           this.Bullets.render(randomX);
@@ -371,6 +345,46 @@
       requestAnimationFrame(this._tick.bind(this));
       this.Bullets.rain();
       this.Bullets.testCollision();
+    }
+  }
+
+  //  GAME State
+  class State {
+    constructor(game) {
+      this._game = game;
+      this._state = "";
+      this._stateObj = {};
+      //this._states = ["boot", "load", "menu", "play", "loose", "win"];
+      var bootState = {
+        //automatic
+        //GameStage.state.add(load, loadState);
+      }
+      var loadState = {
+        //var loadingLabel = "";
+        //GameStage.load.image();
+        //automatic
+        //GameStage.state.add(menu, menuState);
+      }
+      var menuState = {
+        //var menuLabel = "";
+        //name input ?
+        //TODO: wrap in event listener
+        //GameStage.state.add(play, playState);
+      }
+      var looseState = {
+
+      }
+      var winState = {
+        //TODO: wrap in event listener
+        //GameStage.state.add(menu, menuSate);
+      }
+    }
+    render() {
+
+    }
+    add(state, stateObj) {
+      this._state = state;
+      this._stateObj = stateObj;
     }
   }
 
@@ -398,7 +412,9 @@
     }
   }
 
+
   let GameStage = new Game(document.body);
+  GameStage.addState();
   var bg = new PIXI.Sprite.fromImage('Landscape.png');
   bg.anchor.set(0.5);
   bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
@@ -409,6 +425,9 @@
   //let y = (GameStage.renderer.height - GameStage.renderer.height) + 300;
   GameStage.addPerson();
   GameStage.addBullets();
+  var bootState = {};
+  GameStage.state.add("boot", bootState);
+
 
 
   //HELPER COLLISION DETECTION FUNCTION
