@@ -9,10 +9,14 @@
     body {
       margin: 0;
       padding: 0;
+      text-align: center;
+      background-color: black;
     }
 
     canvas {
-      position: absolute;
+      position: relative;
+      margin: 0 auto;
+      margin-top: calc(50% - 92.5px);
       /* width:100vw;
       height:100vh; */
     }
@@ -179,65 +183,131 @@
       this._game.stage.removeChild(this._container);
     }
   }
-
   //BULLETS
-  class Bullettracker {
+  class Bullets {
 
     constructor(game) {
       this._game = game;
       this._isDestroyed = false;
       this._speed = 0;
       this._first;
-      this._bullets = [];
-      this._addSpriteBody = function() {
-        this._body = PIXI.Sprite.fromImage('bullet.png');
+      // this._bullets = [];
+      this._value;
+      // this.bulletItem;
+      this._addSpriteBody = function(spriteNumber) {
+        var bulletImage = 'bullet' + spriteNumber + '.png';
+        this._body = PIXI.Sprite.fromImage(bulletImage);
       }
       this._stagger = function() {
-        return random(0, this._game.renderer.height)
+        return random(0, -200)
       }
-      this.render = function() {
-        let numberOfBullets = 6,
+      this.render = function(randomX) {
+        //if (GameStage.bulletArray.length < 6) {
+        let numberOfBullets = 3,
           spacing = 48,
           xOffset = this._game.renderer.width / 2,
           speed = 2,
           direction = 1;
-        let bullets = [];
-        this._first = false;
+        //let x = spacing * i + xOffset;
+        let x = spacing + xOffset;
+        let bullet = new PIXI.Container();
 
-        for (let i = 0; i < numberOfBullets; i++) {
-          let x = spacing * i + xOffset;
-          let bullet = new PIXI.Container();
-          let y = this._stagger();
-          this._addSpriteBody();
-          bullet.addChild(this._body);
-          bullet.position.x = x;
-          bullet.position.y = y;
-          bullet.vy = speed * direction;
-          direction *= -1;
-          bullets.push(bullet);
-          this._game.stage.addChild(bullet);
-        }
-        this._bullets = bullets;
+        let y = this._stagger();
+        let spriteNumber = random(1, 4);
+        this._addSpriteBody(spriteNumber);
+
+        bullet.addChild(this._body);
+        bullet.position.x = randomX;
+        bullet.position.y = y;
+        bullet.vy = speed * direction;
+        direction *= -1;
+        this._game.stage.addChild(bullet);
+        this._game.bulletArray.push(bullet);
       }
-    //  this._bullets = bullets;
+      this.remove = function(bullet) {
+        var index = GameStage.bulletArray.indexOf(bullet);
+        if (index > -1) {
+          GameStage.bulletArray.splice(index, 1);
+        }
+        GameStage.stage.removeChild(bullet);
+        //GameStage.bulletArray.shift();
+      }
+      // this.render = function() {
+      //   let numberOfBullets = 3,
+      //     spacing = 48,
+      //     xOffset = this._game.renderer.width / 2,
+      //     speed = 2,
+      //     direction = 1;
+      //   let bullets = [];
+      //   this._first = false;
+      //
+      //   for (let i = 0; i < numberOfBullets; i++) {
+      //     let x = spacing * i + xOffset;
+      //     let bullet = new PIXI.Container();
+      //     let y = this._stagger();
+      //
+      //     let spriteNumber = random(1, 4);
+      //     //console.log(spriteNumber);
+      //     this._addSpriteBody(spriteNumber);
+      //     bullet.addChild(this._body);
+      //     bullet.position.x = x;
+      //     bullet.position.y = y;
+      //     bullet.vy = speed * direction;
+      //     direction *= -1;
+      //     bullets.push(bullet);
+      //     this._game.stage.addChild(bullet);
+      //
+      //     bullet.remove = function() {
+      //       console.log(GameStage.stage);
+      //       GameStage.stage.removeChild(bullet);
+      //     }
+      //   }
+      //   this._bullets = bullets;
+      //   this.rain();
+      // }
+
       this.rain = function() {
-      //  console.log(this._first);
-        this._bullets.forEach(function(bullet) {
+
+        GameStage.bulletArray.forEach(function(bullet) {
           if (bullet.position.y > GameStage.renderer.height) {
-            // bullet.position.y = 0;
-            bullet.position.y = 0 - GameStage.bullettracker._stagger();
+
+            GameStage.Bullets.remove(bullet);
+
+            var randomX = random(0, GameStage.renderer.width);
+            var switchInterval = Math.round(random(2, 2000));
+            var frameCount = Math.round(GameStage._lastFrameTime);
+            // if (frameCount % switchInterval == 0) {
+            GameStage.addBullets();
+            //}
+            //bullet.position.y = 0;
+
           } else {
             bullet.position.y += 1
           }
-        //  bullet.position.y = (bullet.position.y > GameStage.renderer.height) ? 0 : bullet.position.y += 1;
+          //  bullet.position.y = (bullet.position.y > GameStage.renderer.height) ? 0 : bullet.position.y += 1;
         });
       }
+
+      // this.rain = function() {
+      //   if (this.bulletItem.position.y > GameStage.renderer.height) {
+      //        //bullet.position.y = 0 - GameStage.Bullets._stagger();
+      //        this.remove();
+      //        var randomX = random(0, GameStage.renderer.width / 2);
+      //        this.render(randomX);
+      //        //bullet.add();
+      //      } else {
+      //        this.bulletItem.position.y += 1
+      //      }
+      // }
+
       this.testCollision = function() {
         //console.log(GameStage.person);
-        this._bullets.forEach(function(bullet) {
+        GameStage.bulletArray.forEach(function(bullet) {
           if (hitTestRectangle(bullet, GameStage.person._container)) {
             //There's a collision
             console.log('collision');
+            //GameStage.Bullets.remove();
+            //GameStage.person.remove();
           } else {
             //There's no collision
             //console.log('no collision');
@@ -245,8 +315,10 @@
         });
       }
     }
+    // remove () {
+    //   this._game.stage.removeChild(this._container.);
+    // }
   }
-
   //GAME
   //
   //class Game extends EventEmitter{
@@ -256,10 +328,12 @@
       this._element = element;
       this.person = null;
       this.stage = new PIXI.Container();
-      this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
+      this.renderer = PIXI.autoDetectRenderer(300, 185);
       this._element.appendChild(this.renderer.view);
       this._lastFrameTime = 0;
-      //this.bullettracker = new Bullettracker(this, 200);
+      this.bulletArray = [];
+
+      //this.Bullets = new Bullets(this, 200);
 
       requestAnimationFrame(this._tick.bind(this));
     }
@@ -273,8 +347,16 @@
       this.person = new Person(this, x, y);
     }
     addBullets() {
-      this.bullettracker = new Bullettracker(this);
-      this.bullettracker.render();
+      var x = 0;
+      var y = 0;
+      var numberOfBullets = 3;
+      for (let i = 0; i < numberOfBullets; i++) {
+        if (GameStage.bulletArray.length <= 3) {
+          var randomX = random(0, GameStage.renderer.width);
+          this.Bullets = new Bullets(this);
+          this.Bullets.render(randomX);
+        }
+      }
     }
 
     removePlayer() {
@@ -287,8 +369,8 @@
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
-      this.bullettracker.rain();
-      this.bullettracker.testCollision();
+      this.Bullets.rain();
+      this.Bullets.testCollision();
     }
   }
 
@@ -301,7 +383,9 @@
       this._assetLoader.add('Character_Standing.png');
       this._assetLoader.add('Character_Jump.png');
       this._assetLoader.add('Landscape.png');
-      this._assetLoader.add('bullet.png');
+      this._assetLoader.add('bullet1.png');
+      this._assetLoader.add('bullet2.png');
+      this._assetLoader.add('bullet3.png');
       this._assetLoader.once('complete', this._onImagesLoaded.bind(this));
     }
     load(callback) {
