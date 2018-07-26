@@ -16,7 +16,7 @@
     canvas {
       position: relative;
       margin: 0 auto;
-      margin-top: calc(50% - 92.5px);
+      margin-top: calc(50vh - 92.5px);
       /* width:100vw;
       height:100vh; */
     }
@@ -85,171 +85,108 @@
   class Bullets {
 
     constructor(game) {
-      this._game = game;
-      this._isDestroyed = false;
-      this._speed = 0;
-      this._first;
-      this._landingPositions = [35, 65, 110];
-      this._addSpriteBody = function(spriteNumber) {
-        var bulletImage = 'bullet' + spriteNumber + '.png';
-        this._body = PIXI.Sprite.fromImage(bulletImage);
+      this.game = game;
+      this.isDestroyed = false;
+      this.speed = 0;
+      this.landingPositions = [35, 65, 110];
+      this.body = null;
+    }
+      addSpriteBody (spriteNumber) {
+        var bulletImage = 'baddie' + spriteNumber + '.gif';
+        this.body = PIXI.Sprite.fromImage(bulletImage);
+        this.body.scale.x = 0.2;
+        this.body.scale.y = 0.2;
       }
-      this._stagger = function() {
-        return random(0, -200)
-      }
-      this.render = function(randomX) {
-        //if (GameStage.bulletArray.length < 6) {
+      render(randomX) {
         let numberOfBullets = 3,
           spacing = 48,
-          xOffset = this._game.renderer.width / 2,
+          xOffset = this.game.renderer.width / 2,
           speed = 2,
           direction = 1;
-        //let x = spacing * i + xOffset;
         let x = spacing + xOffset;
         let bullet = new PIXI.Container();
 
-        let y = this._stagger();
+        let y = random(0, -200);
         let spriteNumber = random(1, 4);
         let landingRandom = random(0, 3);
-        this._addSpriteBody(spriteNumber);
+        this.addSpriteBody(spriteNumber);
 
-        bullet.addChild(this._body);
-        // console.log(landingRandom);
-        bullet._landingPos = this._landingPositions[landingRandom];
+        bullet.addChild(this.body);
+        bullet.landingPos = this.landingPositions[landingRandom];
         bullet.position.x = randomX;
         bullet.position.y = y;
         bullet.vy = speed * direction;
         bullet.rotated = false;
         direction *= -1;
-        this._game.stage.addChild(bullet);
-        this._game.bulletArray.push(bullet);
+        this.game.stage.addChild(bullet);
+        this.game.bulletArray.push(bullet);
       }
-      this.remove = function(bullet) {
+      remove(bullet) {
         var index = GameStage.bulletArray.indexOf(bullet);
         if (index > -1) {
           GameStage.bulletArray.splice(index, 1);
         }
         GameStage.stage.removeChild(bullet);
-        //GameStage.bulletArray.shift();
       }
-
-      this.rain = function() {
-
+      rain() {
         GameStage.bulletArray.forEach(function(bullet) {
-          if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet._landingPos)) {
-            // var currentFrame =
+          if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet.landingPos)) {
             var switchInterval = Math.round(random(2, 2000));
             var frameCount = Math.round(GameStage._lastFrameTime);
-            bullet.position.y = bullet.position.y;
-            if (bullet.rotated !== true) {
-              new Tween(bullet, "rotation", -0.2, 10, true);
-              //bullet.rotation -= 0.2;
-              bullet.rotated = true;
-            }
-
+            //  new Tween(bullet, "rotation", -0.2, 10, true);
             if (frameCount % switchInterval == 0) {
               GameStage.Bullets.remove(bullet);
               GameStage.addBullets();
             }
-
-            // (93, 98.5) is center of center bunny sprite in local container coordinates
-            // we want it to be in (200, 150) of global coords
-            // bullet.pivot.x = 80 + 26 * 0.5;
-            // bullet.pivot.y = 80 + 37 * 0.5;
-            //  bullet.style.transform = "rotate3d(2, -1, -1, -0.2turn)";
-            // if (frameCount % switchInterval == 0) {
-
           } else if (bullet.position.y > GameStage.renderer.height) {
             GameStage.Bullets.remove(bullet);
             GameStage.addBullets();
           } else {
             bullet.position.y += 1
           }
-          //  bullet.position.y = (bullet.position.y > GameStage.renderer.height) ? 0 : bullet.position.y += 1;
         });
       }
-
-      this.testCollision = function() {
-        //console.log(GameStage.person);
+      testCollision() {
         GameStage.bulletArray.forEach(function(bullet) {
-          if (hitTestRectangle(bullet, GameStage.person._container)) {
-            //There's a collision
-            console.log('collision');
-            if (GameStage.state._state !== "load") {
-              GameStage.state.updateInternal();
-              //  GameStage.state.add("load", loadState);
+          if ( GameStage.state.state !== "load") {
+            if (hitTestRectangle(bullet, GameStage.person._container)){
+              GameStage.state._stateObj.update();
+              GameStage.Bullets.remove(bullet);
+              GameStage.Bullets.isDestroyed = true;
             }
-            //GameStage.Bullets.remove();
-            //GameStage.person.remove();
-          } else {
-            //There's no collision
-            //console.log('no collision');
           }
         });
       }
     }
-    // remove () {
-    //   this._game.stage.removeChild(this._container.);
-    // }
+
+class Baddie extends Bullets {
+  constructor(game) {
+    super(name);
   }
+}
 
-  //  Loader
-  class Loader {
-    constructor() {
-      this._callback = null;
-      this._assetLoader = new PIXI.loaders.Loader();
-      this._assetLoader.add('Character_Duck.png');
-      this._assetLoader.add('Character_Standing.png');
-      this._assetLoader.add('Character_Jump.png');
-      this._assetLoader.add('Landscape.png');
-      this._assetLoader.add('bullet1.png');
-      this._assetLoader.add('bullet2.png');
-      this._assetLoader.add('bullet3.png');
-      this._assetLoader.once('complete', this._onImagesLoaded.bind(this));
-    }
-    load(callback) {
-      this._callback = callback;
-      this._assetLoader.load();
-    }
-
-    _onImagesLoaded() {
-      this._callback();
-    }
+class Goodie extends Bullets {
+  constructor(game) {
+    super(game);
   }
-
-
+}
   //  PERSON
   class Person {
     constructor(game, x, y) {
       this._game = game;
       this._isDestroyed = false;
       this._speed = 0;
-      //this._health = MAX_HEALTH;
       this._container = new PIXI.Container();
       this._container.position.x = x;
       this._container.position.y = y;
       this._body = PIXI.Sprite.fromImage('Character_Standing.png');
-      // this._container.width = this._body.width;
-      this._body.anchor.x = 0.5;
-      this._body.anchor.y = -0.25;
       this._body.scale.x = 1;
       this._body.scale.y = 1;
       this._container.addChild(this._body);
       this._game.stage.addChild(this._container);
-
       this._container.width = this._body.width;
       this._container.height = this._body.height;
-
       this._originalY = this._container.position.y;
-      //console.log(this.);
-      // this._intersects = function(other) {
-      //   var d = dist(this.x, this.y, other.x, other.y);
-      //   if (d < this.r + other.r) {
-      //     return true
-      //   } else {
-      //     return false
-      //   }
-      // }
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
@@ -291,50 +228,38 @@
     stan() {
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Standing.png');
-      this._body.anchor.x = 0.5;
-      this._body.anchor.y = -0.25;
       this._container.addChild(this._body);
     }
     duck() {
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Duck.png');
-      this._body.anchor.x = 0.5;
-      this._body.anchor.y = -0.45;
       this._container.addChild(this._body);
     }
     jump() {
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Jump.png');
-      this._body.anchor.x = 0.5;
-      this._body.anchor.y = 0.25;
       this._container.addChild(this._body);
     }
-    // checkHit(bulletPosition) {
-    //   if (this._body.containsPoint(bulletPosition)) {
-    //     return true;
-    //   }
-    //   return false
-    // }
     remove() {
       this._game.stage.removeChild(this._container);
     }
   }
-
-
   //GAME
   //
   //class Game extends EventEmitter{
   class Game {
     constructor(element) {
-      //super();
       this._element = element;
       this.person = null;
+      this.Bullets = null;
       this.stage = new PIXI.Container();
       this.renderer = PIXI.autoDetectRenderer(300, 185);
       this._element.appendChild(this.renderer.view);
       this._lastFrameTime = 0;
       this.bulletArray = [];
       this.state = "";
+      this.score = 0;
+      this.hitPoints = 5;
       requestAnimationFrame(this._tick.bind(this));
     }
     addBg() {
@@ -350,7 +275,7 @@
       var y = 0;
       var numberOfBullets = 3;
       for (let i = 0; i < numberOfBullets; i++) {
-        if (GameStage.bulletArray.length < 3) {
+        if (this.bulletArray.length < 3) {
           var randomX = random(0, GameStage.renderer.width);
           this.Bullets = new Bullets(this);
           this.Bullets.render(randomX);
@@ -358,9 +283,6 @@
       }
     }
     addPerson() {
-      //Comment back in for random positioning
-      // var x = this.renderer.width * (0.1 + Math.random() * 0.8);
-      // var y = this.renderer.height *(0.1 * Math.random() * 0.8);
       let x = GameStage.renderer.width / 2;
       let y = GameStage.renderer.height / 2;
       this.person = new Person(this, x, y);
@@ -368,14 +290,28 @@
     addState() {
       this.state = new State(this);
     }
-
+    clear() {
+      console.log('cleared');
+      this.bulletArray = [];
+      //Remove Everything in menu state
+      this.Bullets.remove();
+    }
     removePlayer() {
       this.person = null
     }
+    reset() {
+      console.log('reset');
+      this.bulletArray = [];
+      //Remove Everything in menu state
+      this.Bullets.remove();
+      this.person.remove();
+      this.stage.removeChildren();
+      //remove Container
+    }
 
     _tick(currentTime) {
-      //this.emit('update', currentTime - this._lastFrameTime, currentTime);
       this._lastFrameTime = currentTime;
+    //  console.log(currentTime);
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
@@ -385,63 +321,121 @@
   }
 
   //  STATES
+
   var bootState = {
-    create: function() {
-      //add sprites/containers
-      console.log('bootstate creating');
-    },
-    //automatic
     preload: function() {
-      //load imags
-      // _header: "bootstate header",
+      //Load assets
+      this._assetLoader = new PIXI.loaders.Loader();
+      this._assetLoader.add('Character_Duck.png');
+      this._assetLoader.add('Character_Standing.png');
+      this._assetLoader.add('Character_Jump.png');
+      this._assetLoader.add('Landscape.png');
+      this._assetLoader.add('bullet1.png');
+      this._assetLoader.add('bullet2.png');
+      this._assetLoader.add('bullet3.png');
+      this._assetLoader.add('baddie1.gif');
+      this._assetLoader.add('baddie2.gif');
+      this._assetLoader.add('baddie3.gif');
+      this._assetLoader.add('end.png');
       console.log('bootstate preloading');
+      this.create();
+    },
+    create: function() {
       GameStage.addBg();
       GameStage.addPerson();
       GameStage.addBullets();
+      let healthContainer = new PIXI.Container();
+      var healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+      healthContainer.addChild(healthText);
+      GameStage.stage.addChild(healthContainer);
     },
-    update: function() {
-      console.log('bootstate updating');
-      GameStage.state.add("load", loadState);
+    update: function(hitPoints, score) {
+      GameStage.hitPoints--;
+      GameStage.stage.children.pop()
+      let healthContainer = new PIXI.Container();
+      var healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+      healthContainer.addChild(healthText);
+      GameStage.stage.addChild(healthContainer);
+      //var healthText = new PIXI.Text('Health: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
 
-      //game.state.add(load, loadState);
+      if (  GameStage.hitPoints == 0)
+        {
+         GameStage.state.add("loose", looseState);
+        }
+      else {
+        //GameStage.state.add("win", winState);
+      }
+
     }
-  }
-  var loadState = {
-    preload: function() {
-      //load imags
-      // _header: "bootstate header",
-      //if (GameStage.state._state !== "load")
-      console.log('LOADING prelod()');
-    },
-    update: function() {
-      console.log('LOADING update()');
-    }
-    // create: function () {
-    //   //add sprites/containers
-    //   console.log('creating');
-    // },
-    // update: function () {
-    //   console.log('updating');
-    //   //GameStage.state.add(load, loadState);
-    //     //game.state.add(load, loadState);
-    // }
-    //var loadingLabel = "";
-    //GameStage.load.image();
-    //automatic
-    //GameStage.state.add(menu, menuState);
   }
   var looseState = {
+    create: function() {
+      console.log('GAME OVER');
+      let container = new PIXI.Container();
+      let endImg = new PIXI.Sprite.fromImage('end.png');
+      endImg.anchor.set(0.5);
+      endImg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+      endImg.scale.x = 0.4;
+      endImg.scale.y = 0.4;
+      endImg.alpha = 0.5;
+      container.addChild(endImg);
 
+       var spinningText = new PIXI.Text('GAME OVER', { font: 'bold 30px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+       container.addChild(spinningText);
+
+       GameStage.clear();
+
+       //RESTTART BUTTON
+       let restartButton = new PIXI.Sprite.fromImage('end.png');
+       restartButton.anchor.set(0.5);
+       restartButton.interactive = true;
+       restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+       restartButton.scale.x = 0.1;
+       restartButton.scale.y = 0.1;
+       restartButton.alpha = 1;
+       restartButton.on('click', function(e) {
+         alert('reset then go to menu');
+         GameStage.reset();
+       });
+       container.addChild(restartButton);
+       GameStage.stage.addChild(container);
+
+    },
+    preload: function() {
+      this.create();
+    },
+    update: function() {
+    }
   }
   var menuState = {
-    //var menuLabel = "";
-    //name input ?
-    //TODO: wrap in event listener
-    //GameStage.state.add(play, playState);
+    create: function() {
+      console.log('in menu state');
+      GameStage.reset();
+      //create name input
+      //Add new container
+        //trigger play function with, call this.update
+    },
+    preload: function() {
+      this.create();
+    },
+    update: function() {
+      //call this
+      //aka bootstate right now, needs to be swiched
+      //GameStage.state.add("play", playState)
+    }
   }
   var winState = {
     //TODO: wrap in event listener
     //GameStage.state.add(menu, menuSate);
+    create: function() {
+
+    },
+    preload: function() {
+
+    },
+    update: function() {
+
+    }
   }
 
   //  GAME State
@@ -451,23 +445,10 @@
       this._state = "";
       this._stateObj = {};
     }
-    preload() {
-      //this._game.stateObj.preload();
-      GameStage.state._stateObj.preload();
-      // GameStage.state.stateObj.update();
-    }
-    create() {
-      //this._game.stateObj.preload();
-      GameStage.state._stateObj.create();
-      // GameStage.state.stateObj.update();
-    }
     add(state, stateObj) {
       this._state = state;
       this._stateObj = stateObj;
-      this.preload();
-    }
-    updateInternal() {
-      GameStage.state._stateObj.update();
+      GameStage.state._stateObj.preload();
     }
   }
 
