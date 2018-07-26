@@ -90,7 +90,7 @@
       this.speed = 0;
       this.landingPositions = [35, 65, 110];
       this.body = null;
-      this.spriteNumber = random(1, 3);
+      this.spriteNumber = random(1, 4);
       this.landingRandom = random(0,3);
       this.randomX = random(0, GameStage.renderer.width);
     }
@@ -115,6 +115,8 @@
         bullet.position.y = y;
         bullet.vy = speed * direction;
         bullet.rotated = false;
+        bullet.isBaddie = this.spriteNumber >= 3 ? true : false;
+        bullet.isGoodie = this.spriteNumber <= 2 ? true : false;
         direction *= -1;
 
         this.game.stage.addChild(bullet);
@@ -148,7 +150,17 @@
       testCollision() {
         GameStage.bulletArray.forEach(function(bullet) {
           if ( GameStage.state.state !== "load") {
+          //  console.log(bullet);
             if (hitTestRectangle(bullet, GameStage.person._container)){
+              if (bullet.isBaddie == true) {
+                console.log('baddie');
+                //clout goes down
+                GameStage.hitPoints--;
+              } else {
+                console.log('goodie');
+                //clout goes up
+                GameStage.hitPoints++;
+              }
               GameStage.state._stateObj.update();
               GameStage.Bullets.remove(bullet);
               GameStage.addBullets();
@@ -158,26 +170,6 @@
       }
     }
 
-class Baddie extends Bullets {
-  constructor(game) {
-    super(name);
-  }
-}
-
-class Goodie extends Bullets {
-  constructor(game) {
-    super(game);
-  }
-}
-
-//
-// createBaddies() {
-//
-// }
-//
-// createGoodies() {
-//
-// }
   //  PERSON
   class Person {
     constructor(game, x, y) {
@@ -266,7 +258,6 @@ class Goodie extends Bullets {
       this._lastFrameTime = 0;
       this.bulletArray = [];
       this.state = "";
-      this.score = 0;
       this.hitPoints = 5;
       requestAnimationFrame(this._tick.bind(this));
     }
@@ -328,7 +319,8 @@ class Goodie extends Bullets {
   }
 
   //  STATES
-
+var healthContainerIndex = 0;
+var healthText;
   var bootState = {
     preload: function() {
       //Load assets
@@ -352,20 +344,15 @@ class Goodie extends Bullets {
       GameStage.addPerson();
       GameStage.addBullets();
       let healthContainer = new PIXI.Container();
-      var healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
       healthContainer.addChild(healthText);
       GameStage.stage.addChild(healthContainer);
+      healthContainerIndex = GameStage.stage.children.indexOf(healthContainer);
     },
-    update: function(hitPoints, score) {
-      GameStage.hitPoints--;
-      let healthContainer = new PIXI.Container();
-      var healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
-      healthContainer.addChild(healthText);
-      GameStage.stage.children.pop();
-      GameStage.stage.children.pop();
-      GameStage.stage.addChild(healthContainer);
+    update: function(hitPoints) {
+      healthText.setText('Clout: ' + GameStage.hitPoints);
 
-      if (  GameStage.hitPoints == 0)
+      if ( GameStage.hitPoints == 0)
         {
          GameStage.state.add("loose", looseState);
         }
