@@ -115,8 +115,8 @@
         bullet.position.y = y;
         bullet.vy = speed * direction;
         bullet.rotated = false;
-        bullet.isBaddie = this.spriteNumber >= 3 ? true : false;
-        bullet.isGoodie = this.spriteNumber <= 2 ? true : false;
+        bullet.isBaddie = this.spriteNumber >= 2 ? true : false;
+        bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
         direction *= -1;
 
         this.game.stage.addChild(bullet);
@@ -155,7 +155,7 @@
               if (bullet.isBaddie == true) {
                 console.log('baddie');
                 //clout goes down
-                GameStage.hitPoints--;
+                GameStage.hitPoints = GameStage.hitPoints - 2;
               } else {
                 console.log('goodie');
                 //clout goes up
@@ -239,6 +239,7 @@
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Jump.png');
       this._container.addChild(this._body);
+
     }
     remove() {
       this._game.stage.removeChild(this._container);
@@ -258,7 +259,7 @@
       this._lastFrameTime = 0;
       this.bulletArray = [];
       this.state = "";
-      this.hitPoints = 5;
+      this.hitPoints = 1;
       requestAnimationFrame(this._tick.bind(this));
     }
     addBg() {
@@ -313,14 +314,53 @@
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
-      this.Bullets.rain();
-      this.Bullets.testCollision();
+      if (GameStage.state._state == "boot") {
+        this.Bullets.rain();
+        this.Bullets.testCollision();
+      }
     }
   }
 
   //  STATES
 var healthContainerIndex = 0;
 var healthText;
+var menuState = {
+  preload: function() {
+    this.create();
+  },
+  create: function() {
+    var bg = new PIXI.Sprite(PIXI.Texture.WHITE);
+    bg.anchor.set(0.5);
+    bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+    bg.scale.x = 300;
+    bg.scale.y = 185;
+    GameStage.stage.addChild(bg);
+
+    //START GAME BUTTON
+    let container = new PIXI.Container();
+    let restartButton = new PIXI.Sprite.fromImage('end.png');
+    restartButton.anchor.set(0.5);
+    restartButton.interactive = true;
+    restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+    restartButton.scale.x = 0.1;
+    restartButton.scale.y = 0.1;
+    restartButton.alpha = 1;
+    container.addChild(restartButton);
+    var playText = new PIXI.Text('u cant win. \n just try and stay \n relevant', { font: 'bold 15px Arial', fill: '#000', align: 'center', strokeThickness: 1 });
+    container.addChild(playText);
+    GameStage.stage.addChild(container);
+    var _this = this;
+    restartButton.on('click', function(e) {
+      _this.update();
+    });
+
+
+
+  },
+  update: function() {
+    GameStage.state.add("boot", bootState);
+  }
+}
   var bootState = {
     preload: function() {
       //Load assets
@@ -352,7 +392,7 @@ var healthText;
     update: function(hitPoints) {
       healthText.setText('Clout: ' + GameStage.hitPoints);
 
-      if ( GameStage.hitPoints == 0)
+      if ( GameStage.hitPoints <= 0)
         {
          GameStage.state.add("loose", looseState);
         }
@@ -364,7 +404,6 @@ var healthText;
   }
   var looseState = {
     create: function() {
-      //console.log('sry ur no longer relevant :()//');
       let container = new PIXI.Container();
       let endImg = new PIXI.Sprite.fromImage('end.png');
       endImg.anchor.set(0.5);
@@ -374,7 +413,7 @@ var healthText;
       endImg.alpha = 0.5;
       container.addChild(endImg);
 
-       var spinningText = new PIXI.Text('sry ur no longer \n relevant :(', { font: 'bold 30px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+       var spinningText = new PIXI.Text('sry u just faded into \n obscurity :(', { font: 'bold 30px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
        container.addChild(spinningText);
 
        GameStage.clear();
@@ -399,23 +438,6 @@ var healthText;
       this.create();
     },
     update: function() {
-    }
-  }
-  var menuState = {
-    create: function() {
-      console.log('in menu state');
-      GameStage.reset();
-      //create name input
-      //Add new container
-        //trigger play function with, call this.update
-    },
-    preload: function() {
-      this.create();
-    },
-    update: function() {
-      //call this
-      //aka bootstate right now, needs to be swiched
-      //GameStage.state.add("play", playState)
     }
   }
   var winState = {
@@ -504,6 +526,6 @@ var healthText;
   //INIT
   let GameStage = new Game(document.body);
   GameStage.addState();
-  GameStage.state.add("boot", bootState);
+  GameStage.state.add("menu", menuState);
 
 </script>
