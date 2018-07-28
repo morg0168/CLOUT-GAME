@@ -73,11 +73,11 @@
   window.addEventListener('keyup', function(event) {
     switch (event.keyCode) {
       case 16:
-        GameStage.person.stan();
+        GameStage.person.duckUp();
         break;
       case 32:
-        GameStage.person.stan();
-        // mainCharacter.stan();
+        GameStage.person.jumpDown();
+
     }
   });
 
@@ -88,14 +88,14 @@
       this.game = game;
       this.isDestroyed = false;
       this.speed = 0;
-      this.landingPositions = [35, 65, 110];
+      this.landingPositions = [35, 65];
       this.body = null;
       this.spriteNumber = random(1, 4);
       this.landingRandom = random(0,3);
       this.randomX = random(0, GameStage.renderer.width);
     }
       render() {
-        let numberOfBullets = 3,
+        let numberOfBullets = 6,
           spacing = 48,
           xOffset = this.game.renderer.width / 2,
           speed = 2,
@@ -190,7 +190,7 @@
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
-      var newSpot = (dtLeftX - 45);
+      var newSpot = (dtLeftX - 25);
       var maxLeftX = (GameStage.renderer.width / 2) - 150;
       var playerHalfWidth = this._body.width / 2;
 
@@ -203,7 +203,7 @@
     }
     moveRight() {
       var dtLeftX = this._container.position.x;
-      var newSpot = (dtLeftX + 45);
+      var newSpot = (dtLeftX + 25);
       var maxLeftX = (GameStage.renderer.width / 2) + 150;
       var playerHalfWidth = this._body.width / 2;
 
@@ -220,10 +220,11 @@
       new Tween(this, "_container.position.y", this._originalY, 10, true);
     }
     moveDown() {
-      var dtLeftY = this._container.position.y;
-      var newSpot = (dtLeftY + 25);
-      var orig = (this._originalY + 25);
-      new Tween(this, "_container.position.y", orig, 10, true);
+      // var dtLeftY = this._container.position.y;
+      // var newSpot = (dtLeftY + 25);
+      // var orig = (this._originalY + 25);
+      // new Tween(this, "_container.position.y", newSpot, 10, true);
+      this.jumpDown();
     }
     stan() {
       this._container.removeChild(this._body);
@@ -231,15 +232,46 @@
       this._container.addChild(this._body);
     }
     duck() {
+      var differenceVar = 30;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftY + differenceVar);
+      var orig = (this._originalY + differenceVar);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
+
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Duck.png');
       this._container.addChild(this._body);
     }
+    duckUp() {
+      var differenceVar = 30;
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftY - differenceVar);
+      var orig = (this._originalY - differenceVar);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
+
+      this._container.removeChild(this._body);
+      this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      this._container.addChild(this._body);
+    }
     jump() {
+      var dtLeftY = this._container.position.y;
+      console.log();
+      var newSpot = (dtLeftY - 25);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
+
+      //move higher
       this._container.removeChild(this._body);
       this._body = PIXI.Sprite.fromImage('Character_Jump.png');
       this._container.addChild(this._body);
+    }
+    jumpDown() {
+      var dtLeftY = this._container.position.y;
+      var newSpot = (dtLeftY + 25);
+      new Tween(this, "_container.position.y", newSpot, 10, true);
 
+      this._container.removeChild(this._body);
+      this._body = PIXI.Sprite.fromImage('Character_Standing.png');
+      this._container.addChild(this._body);
     }
     remove() {
       this._game.stage.removeChild(this._container);
@@ -273,7 +305,7 @@
     addBullets() {
       var x = 0;
       var y = 0;
-      var numberOfBullets = 3;
+      var numberOfBullets = 6;
       for (let i = 0; i < numberOfBullets; i++) {
         if (this.bulletArray.length < numberOfBullets) {
           this.Bullets = new Bullets(this);
@@ -283,7 +315,7 @@
     }
     addPerson() {
       let x = GameStage.renderer.width / 2;
-      let y = GameStage.renderer.height / 2;
+      let y = GameStage.renderer.height / 2 + 25;
       this.person = new Person(this, x, y);
     }
     addState() {
@@ -336,7 +368,7 @@ var menuState = {
     bg.scale.y = 185;
     GameStage.stage.addChild(bg);
 
-    //START GAME BUTTON
+    //START GAME BUTTONfch
     let container = new PIXI.Container();
     let restartButton = new PIXI.Sprite.fromImage('end.png');
     restartButton.anchor.set(0.5);
