@@ -48,26 +48,21 @@
     switch (event.keyCode) {
       case 37: //Left
         GameStage.person.moveLeft();
-        //  mainCharacter.moveLeft();
         break;
       case 38: //up
         GameStage.person.moveUp();
-        //  mainCharacter.moveUp();
         break;
       case 39: //Right
         GameStage.person.moveRight();
-        //  mainCharacter.moveRight();
         break;
-      case 40: //Down. TODO : Confirm
+      case 40: //Down.
         GameStage.person.moveDown();
-        //  mainCharacter.moveDown();
         break;
       case 16: // Shift (duck)
         GameStage.person.duck();
         break;
       case 32:
         GameStage.person.jump();
-        //mainCharacter.duck();
     }
   });
   window.addEventListener('keyup', function(event) {
@@ -187,6 +182,7 @@
       this._container.width = this._body.width;
       this._container.height = this._body.height;
       this._originalY = this._container.position.y;
+      this.frames = [];
     }
     moveLeft() {
       var dtLeftX = this._container.position.x;
@@ -396,20 +392,20 @@ var menuState = {
   var bootState = {
     preload: function() {
       //Load assets
-      this._assetLoader = new PIXI.loaders.Loader();
-      this._assetLoader.add('Character_Duck.png');
-      this._assetLoader.add('Character_Standing.png');
-      this._assetLoader.add('Character_Jump.png');
-      this._assetLoader.add('Landscape.png');
-      this._assetLoader.add('bullet1.png');
-      this._assetLoader.add('bullet2.png');
-      this._assetLoader.add('bullet3.png');
-      this._assetLoader.add('baddie1.gif');
-      this._assetLoader.add('baddie2.gif');
-      this._assetLoader.add('baddie3.gif');
-      this._assetLoader.add('end.png');
-      console.log('bootstate preloading');
-      this.create();
+      PIXI.loader
+      .add("Character_Duck.png")
+      .add("Character_Standing.png")
+      .add("Character_Jump.png")
+      .add('Landscape.png')
+      .add('bullet1.png')
+      .add('bullet2.png')
+      .add('bullet3.png')
+      .add('baddie1.gif')
+      .add('baddie2.gif')
+      .add('baddie3.gif')
+      .add('end.png')
+      .load(this.create);
+    //  this.create();
     },
     create: function() {
       GameStage.addBg();
