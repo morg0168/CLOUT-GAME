@@ -16,15 +16,61 @@
     canvas {
       position: relative;
       margin: 0 auto;
-      margin-top: calc(50vh - 92.5px);
-      /* width:100vw;
-      height:100vh; */
+      margin-top: calc(20vh - 92.5px);
+    }
+    #controls {
+      position: absolute;
+      margin-top: calc(70vh - 92.5px);
+      width:100%;
+    }
+    .up {
+      position:absolute;
+      top:-60px;
+    }
+    .down {
+      position:absolute;
+      bottom:-60px;
+    }
+    .right {
+      margin-left:60px;
+    }
+    #controls div {
+      display:inline-block;
+      max-width:57px;
+    }
+    #controls img{
+      max-width:100%;
+    }
+
+    @media screen and (min-width: 1025px) {
+      canvas {
+        position: relative;
+        margin: 0 auto;
+        margin-top: calc(50vh - 92.5px);
+      }
+      #controls {
+        display:none;
+      }
     }
   </style>
 </head>
 
 <body>
   <div id="app"></div>
+  <div id="controls">
+    <div class="left">
+      <img id="left" src="leftButton.png" />
+    </div>
+    <div class="up">
+      <img id="up" src="upButton.png" />
+    </div>
+    <div class="down">
+      <img id="down" src="downButton.png" />
+    </div>
+    <div class="right">
+      <img id="right" src="rightButton.png" />
+    </div>
+  </div>
   <!-- built files will be auto injected -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenLite.min.js"></script>
@@ -37,6 +83,52 @@
 
 
 <script>
+  /* Viewport Width
+    /––––––––––––––––––––––––*/
+  var $vpWidth = jQuery(window).width();
+
+  /* Touch Device
+  /––––––––––––––––––––––––*/
+  var $root = $('html');
+  var isTouch = 'ontouchstart' in document.documentElement;
+  if (isTouch) {
+    $root.attr('data-touch', 'true');
+  } else {
+    $root.attr('data-touch', 'false');
+  }
+
+  if (isTouch) {
+    controls.isVisible = true;
+  }
+
+  class Controls {
+    constructor() {
+      this.isVisible = false;
+    }
+    showControls() {
+      return this.isVisible = true;
+    }
+    hideControls() {
+      return this.isVisible = false;
+    }
+  }
+
+  window.addEventListener('pointerdown', function(event) {
+    switch (event.target.id) {
+      case 'left':
+        GameStage.person.moveLeft();
+        break;
+      case 'right':
+        GameStage.person.moveRight();
+        break;
+      case 'up':
+        GameStage.person.moveUp();
+        break;
+      case 'down':
+        GameStage.person.moveDown();
+    }
+  });
+
   function random(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -86,139 +178,139 @@
       this.landingPositions = [35, 65];
       this.body = null;
       this.spriteNumber = random(1, 4);
-      this.landingRandom = random(0,3);
+      this.landingRandom = random(0, 3);
       this.randomX = random(0, GameStage.renderer.width);
       this.randomY = random(0, -200);
       this.sound = "";
       this.notification = null;
     }
-      render() {
-        let numberOfBullets = 6,
-          spacing = 48,
-          xOffset = this.game.renderer.width / 2,
-          speed = 2,
-          direction = 1;
-        let x = spacing + xOffset;
-        let bullet = new PIXI.Container();
+    render() {
+      let numberOfBullets = 6,
+        spacing = 48,
+        xOffset = this.game.renderer.width / 2,
+        speed = 2,
+        direction = 1;
+      let x = spacing + xOffset;
+      let bullet = new PIXI.Container();
 
-        var bulletImage = 'bullet' + this.spriteNumber + '.gif';
-        this.body = PIXI.Sprite.fromImage(bulletImage);
-        this.body.scale.x = 0.2;
-        this.body.scale.y = 0.2;
+      var bulletImage = 'bullet' + this.spriteNumber + '.gif';
+      this.body = PIXI.Sprite.fromImage(bulletImage);
+      this.body.scale.x = 0.2;
+      this.body.scale.y = 0.2;
 
-        bullet.addChild(this.body);
-        bullet.landingPos = this.landingPositions[this.landingRandom];
-        bullet.position.x = this.randomX;
-        bullet.position.y = this.randomY;
-        bullet.vy = speed * direction;
-        bullet.rotated = false;
-        bullet.isBaddie = this.spriteNumber >= 2 ? true : false; // bullet2.gif, bullet1.gif
-        bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
-        direction *= -1;
+      bullet.addChild(this.body);
+      bullet.landingPos = this.landingPositions[this.landingRandom];
+      bullet.position.x = this.randomX;
+      bullet.position.y = this.randomY;
+      bullet.vy = speed * direction;
+      bullet.rotated = false;
+      bullet.isBaddie = this.spriteNumber >= 2 ? true : false; // bullet2.gif, bullet1.gif
+      bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
+      direction *= -1;
 
-        this.game.stage.addChild(bullet);
-        this.game.bulletArray.push(bullet);
-      }
+      this.game.stage.addChild(bullet);
+      this.game.bulletArray.push(bullet);
+    }
 
-      playSound() {
-        this.sound = 'bullet' + this.spriteNumber + '.mp3';
-        var audio = new Audio(this.sound);
-        //audio.play();
-      }
+    playSound() {
+      this.sound = 'bullet' + this.spriteNumber + '.mp3';
+      var audio = new Audio(this.sound);
+      //audio.play();
+    }
 
-      showNotification() {
-        let notificationBullet = new PIXI.Container();
-        var notificationImage = 'bullet' + this.spriteNumber + '.png';
-        let personX = this.game.person._container.x;
-        let personY = this.game.person._container.y - 35;
-        let speed = 1;
-        let directionN;
+    showNotification() {
+      let notificationBullet = new PIXI.Container();
+      var notificationImage = 'bullet' + this.spriteNumber + '.png';
+      let personX = this.game.person._container.x;
+      let personY = this.game.person._container.y - 35;
+      let speed = 1;
+      let directionN;
 
-        notificationBullet.position.x = personX;
-        notificationBullet.position.y = personY;
-        this.notification = PIXI.Sprite.fromImage(notificationImage);
-        notificationBullet.addChild(this.notification);
-        this.game.stage.addChild(notificationBullet);
+      notificationBullet.position.x = personX;
+      notificationBullet.position.y = personY;
+      this.notification = PIXI.Sprite.fromImage(notificationImage);
+      notificationBullet.addChild(this.notification);
+      this.game.stage.addChild(notificationBullet);
 
-        this.game.bulletNotificationArray.push(this.notification);
-        this.fadeNotification();
-      }
+      this.game.bulletNotificationArray.push(this.notification);
+      this.fadeNotification();
+    }
 
-      fadeNotification() {
-        var _this = this;
-        if (this.game.bulletNotificationArray.length > 0) {
-          this.game.bulletNotificationArray.forEach(function(currentValue, index, arr) {
-              currentValue.position.y -= 1
-              if (currentValue.alpha <= 0) {
-                _this.remove(currentValue, GameStage.bulletNotificationArray);
-              } else {
-                currentValue.alpha -= 0.01;
-              }
-          });
-        }
-      }
-     fadeBullets(item, arr) {
-        var _this = this;
-        var index = arr.indexOf(item);
-        var timer = setInterval(function() {
-          if (index > -1) {
-              if (item.alpha <= 0.2) {
-                 clearInterval(timer);
-                 _this.remove(item, arr);
-               } else {
-                  item.alpha -= 0.01;
-              }
-            }
-        }, 50);
-      }
-      remove(item, arr) {
-        var index = arr.indexOf(item);
-        if (index > -1) {
-          arr.splice(index, 1);
-        }
-        GameStage.stage.removeChild(item);
-      }
-      rain() {
-        GameStage.bulletArray.forEach(function(bullet) {
-          if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet.landingPos)) {
-            var switchInterval = Math.round(random(2, 2000));
-            var frameCount = Math.round(GameStage._lastFrameTime);
-              if (frameCount % switchInterval == 0) {
-              GameStage.Bullets.fadeBullets(bullet, GameStage.bulletArray);
-              GameStage.addBullets();
-            }
-          } else if (bullet.position.y > GameStage.renderer.height) {
-            GameStage.Bullets.remove(bullet, GameStage.bulletArray);
-            GameStage.addBullets();
+    fadeNotification() {
+      var _this = this;
+      if (this.game.bulletNotificationArray.length > 0) {
+        this.game.bulletNotificationArray.forEach(function(currentValue, index, arr) {
+          currentValue.position.y -= 1
+          if (currentValue.alpha <= 0) {
+            _this.remove(currentValue, GameStage.bulletNotificationArray);
           } else {
-            bullet.position.y += 1
-          }
-        });
-      }
-      testCollision() {
-        GameStage.bulletArray.forEach(function(bullet) {
-          if ( GameStage.state.state !== "load") {
-          //  console.log(bullet);
-            if (hitTestRectangle(bullet, GameStage.person._container)){
-              if (bullet.isBaddie == true) {
-                console.log('baddie');
-                //clout goes down
-                GameStage.hitPoints = GameStage.hitPoints - 2;
-              } else {
-                console.log('goodie');
-                //clout goes up
-                GameStage.hitPoints++;
-              }
-              GameStage.state._stateObj.update();
-              GameStage.Bullets.playSound();
-              GameStage.Bullets.showNotification();
-              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
-              GameStage.addBullets();
-            }
+            currentValue.alpha -= 0.01;
           }
         });
       }
     }
+    fadeBullets(item, arr) {
+      var _this = this;
+      var index = arr.indexOf(item);
+      var timer = setInterval(function() {
+        if (index > -1) {
+          if (item.alpha <= 0.2) {
+            clearInterval(timer);
+            _this.remove(item, arr);
+          } else {
+            item.alpha -= 0.01;
+          }
+        }
+      }, 50);
+    }
+    remove(item, arr) {
+      var index = arr.indexOf(item);
+      if (index > -1) {
+        arr.splice(index, 1);
+      }
+      GameStage.stage.removeChild(item);
+    }
+    rain() {
+      GameStage.bulletArray.forEach(function(bullet) {
+        if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet.landingPos)) {
+          var switchInterval = Math.round(random(2, 2000));
+          var frameCount = Math.round(GameStage._lastFrameTime);
+          if (frameCount % switchInterval == 0) {
+            GameStage.Bullets.fadeBullets(bullet, GameStage.bulletArray);
+            GameStage.addBullets();
+          }
+        } else if (bullet.position.y > GameStage.renderer.height) {
+          GameStage.Bullets.remove(bullet, GameStage.bulletArray);
+          GameStage.addBullets();
+        } else {
+          bullet.position.y += 1
+        }
+      });
+    }
+    testCollision() {
+      GameStage.bulletArray.forEach(function(bullet) {
+        if (GameStage.state.state !== "load") {
+          //  console.log(bullet);
+          if (hitTestRectangle(bullet, GameStage.person._container)) {
+            if (bullet.isBaddie == true) {
+              console.log('baddie');
+              //clout goes down
+              GameStage.hitPoints = GameStage.hitPoints - 2;
+            } else {
+              console.log('goodie');
+              //clout goes up
+              GameStage.hitPoints++;
+            }
+            GameStage.state._stateObj.update();
+            GameStage.Bullets.playSound();
+            GameStage.Bullets.showNotification();
+            GameStage.Bullets.remove(bullet, GameStage.bulletArray);
+            GameStage.addBullets();
+          }
+        }
+      });
+    }
+  }
 
   //  PERSON
   class Person {
@@ -377,7 +469,7 @@
       console.log('cleared');
       //Remove Everything in menu state
       //this.Bullets.remove(bullet, bulletArray);
-       this.bulletArray = [];
+      this.bulletArray = [];
     }
     removePlayer() {
       this.person = null
@@ -394,7 +486,7 @@
 
     _tick(currentTime) {
       this._lastFrameTime = currentTime;
-    //  console.log(currentTime);
+      //  console.log(currentTime);
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
@@ -407,69 +499,79 @@
   }
 
   //  STATES
-var healthContainerIndex = 0;
-var healthText;
-var menuState = {
-  preload: function() {
-    this.create();
-  },
-  create: function() {
-    var bg = new PIXI.Sprite(PIXI.Texture.WHITE);
-    bg.anchor.set(0.5);
-    bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
-    bg.scale.x = 300;
-    bg.scale.y = 185;
-    GameStage.stage.addChild(bg);
+  var healthContainerIndex = 0;
+  var healthText;
+  var menuState = {
+    preload: function() {
+      this.create();
+    },
+    create: function() {
+      var bg = new PIXI.Sprite(PIXI.Texture.WHITE);
+      bg.anchor.set(0.5);
+      bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+      bg.scale.x = 300;
+      bg.scale.y = 185;
+      GameStage.stage.addChild(bg);
 
-    //START GAME BUTTONfch
-    let container = new PIXI.Container();
-    let restartButton = new PIXI.Sprite.fromImage('end.png');
-    restartButton.anchor.set(0.5);
-    restartButton.interactive = true;
-    restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
-    restartButton.scale.x = 0.1;
-    restartButton.scale.y = 0.1;
-    restartButton.alpha = 1;
-    container.addChild(restartButton);
-    var playText = new PIXI.Text('u cant win. \n just try and stay \n relevant', { font: 'bold 15px Arial', fill: '#000', align: 'center', strokeThickness: 1 });
-    container.addChild(playText);
-    GameStage.stage.addChild(container);
-    var _this = this;
-    restartButton.on('click', function(e) {
-      _this.update();
-    });
+      //START GAME BUTTONfch
+      let container = new PIXI.Container();
+      let restartButton = new PIXI.Sprite.fromImage('end.png');
+      restartButton.anchor.set(0.5);
+      restartButton.interactive = true;
+      restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+      restartButton.scale.x = 0.1;
+      restartButton.scale.y = 0.1;
+      restartButton.alpha = 1;
+      container.addChild(restartButton);
+      var playText = new PIXI.Text('u cant win. \n just try and stay \n relevant', {
+        font: 'bold 15px Arial',
+        fill: '#000',
+        align: 'center',
+        strokeThickness: 1
+      });
+      container.addChild(playText);
+      GameStage.stage.addChild(container);
+      var _this = this;
+      restartButton.on('pointerdown', function(e) {
+        _this.update();
+      });
 
-
-
-  },
-  update: function() {
-    GameStage.state.add("boot", bootState);
+    },
+    update: function() {
+      GameStage.state.add("boot", bootState);
+    }
   }
-}
   var bootState = {
     preload: function() {
       //Load assets
       PIXI.loader
-      .add("Character_Duck.png")
-      .add("Character_Standing.png")
-      .add("Character_Jump.png")
-      .add('Landscape.png')
-      .add('bullet1.png')
-      .add('bullet2.png')
-      .add('bullet3.png')
-      .add('baddie1.gif')
-      .add('baddie2.gif')
-      .add('baddie3.gif')
-      .add('end.png')
-      .load(this.create);
-    //  this.create();
+        .add("Character_Duck.png")
+        .add("Character_Standing.png")
+        .add("Character_Jump.png")
+        .add('Landscape.png')
+        .add('bullet1.png')
+        .add('bullet2.png')
+        .add('bullet3.png')
+        .add('baddie1.gif')
+        .add('baddie2.gif')
+        .add('baddie3.gif')
+        .add('end.png')
+        .load(this.create);
+      //  this.create();
     },
     create: function() {
       GameStage.addBg();
       GameStage.addPerson();
       GameStage.addBullets();
       let healthContainer = new PIXI.Container();
-      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, { display: 'block',  width: '100%', font: 'bold 15px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
+      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
+        display: 'block',
+        width: '100%',
+        font: 'bold 15px Arial',
+        fill: '#ffffff',
+        align: 'center',
+        strokeThickness: 1
+      });
       healthContainer.addChild(healthText);
       GameStage.stage.addChild(healthContainer);
       healthContainerIndex = GameStage.stage.children.indexOf(healthContainer);
@@ -477,11 +579,9 @@ var menuState = {
     update: function(hitPoints) {
       healthText.setText('Clout: ' + GameStage.hitPoints);
 
-      if ( GameStage.hitPoints <= 0)
-        {
-         GameStage.state.add("loose", looseState);
-        }
-      else {
+      if (GameStage.hitPoints <= 0) {
+        GameStage.state.add("loose", looseState);
+      } else {
         //GameStage.state.add("win", winState);
       }
 
@@ -498,32 +598,36 @@ var menuState = {
       endImg.alpha = 0.5;
       container.addChild(endImg);
 
-       var spinningText = new PIXI.Text('sry u just faded into \n obscurity :(', { font: 'bold 30px Arial', fill: '#ffffff', align: 'center', strokeThickness: 1 });
-       container.addChild(spinningText);
+      var spinningText = new PIXI.Text('sry u just faded into \n obscurity :(', {
+        font: 'bold 30px Arial',
+        fill: '#ffffff',
+        align: 'center',
+        strokeThickness: 1
+      });
+      container.addChild(spinningText);
 
-       GameStage.clear();
+      GameStage.clear();
 
-       //RESTTART BUTTON
-       let restartButton = new PIXI.Sprite.fromImage('end.png');
-       restartButton.anchor.set(0.5);
-       restartButton.interactive = true;
-       restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
-       restartButton.scale.x = 0.1;
-       restartButton.scale.y = 0.1;
-       restartButton.alpha = 1;
-       restartButton.on('click', function(e) {
-         window.location.href = window.location.href;
+      //RESTTART BUTTON
+      let restartButton = new PIXI.Sprite.fromImage('end.png');
+      restartButton.anchor.set(0.5);
+      restartButton.interactive = true;
+      restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
+      restartButton.scale.x = 0.1;
+      restartButton.scale.y = 0.1;
+      restartButton.alpha = 1;
+      restartButton.on('pointerdown', function(e) {
+        window.location.href = window.location.href;
         // GameStage.reset();
-       });
-       container.addChild(restartButton);
-       GameStage.stage.addChild(container);
+      });
+      container.addChild(restartButton);
+      GameStage.stage.addChild(container);
 
     },
     preload: function() {
       this.create();
     },
-    update: function() {
-    }
+    update: function() {}
   }
   var winState = {
     //TODO: wrap in event listener
@@ -612,5 +716,4 @@ var menuState = {
   let GameStage = new Game(document.body);
   GameStage.addState();
   GameStage.state.add("menu", menuState);
-
 </script>
