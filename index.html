@@ -88,6 +88,8 @@
       this.spriteNumber = random(1, 4);
       this.landingRandom = random(0,3);
       this.randomX = random(0, GameStage.renderer.width);
+      this.sound = "";
+      this.notification = "";
     }
       render() {
         let numberOfBullets = 6,
@@ -110,13 +112,27 @@
         bullet.position.y = y;
         bullet.vy = speed * direction;
         bullet.rotated = false;
-        bullet.isBaddie = this.spriteNumber >= 2 ? true : false;
+        bullet.isBaddie = this.spriteNumber >= 2 ? true : false; // bullet2.gif, bullet1.gif
         bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
         direction *= -1;
+
 
         this.game.stage.addChild(bullet);
         this.game.bulletArray.push(bullet);
       }
+
+      playSound() {
+        this.sound = 'bullet' + this.spriteNumber + '.mp3';
+        this.notification = 'bullet' + this.spriteNumber + '.png';
+
+        console.log(this.sound);
+        var audio = new Audio(this.sound);
+        //audio.play();
+      }
+      showNotification() {
+
+      }
+
       remove(bullet) {
         var index = GameStage.bulletArray.indexOf(bullet);
         if (index > -1) {
@@ -158,6 +174,8 @@
               }
               GameStage.state._stateObj.update();
               GameStage.Bullets.remove(bullet);
+              GameStage.Bullets.playSound();
+              GameStage.Bullets.showNotification();
               GameStage.addBullets();
             }
           }
