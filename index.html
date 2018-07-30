@@ -88,8 +88,9 @@
       this.spriteNumber = random(1, 4);
       this.landingRandom = random(0,3);
       this.randomX = random(0, GameStage.renderer.width);
+      this.randomY = random(0, -200);
       this.sound = "";
-      this.notification = "";
+      this.notification = null;
     }
       render() {
         let numberOfBullets = 6,
@@ -99,7 +100,6 @@
           direction = 1;
         let x = spacing + xOffset;
         let bullet = new PIXI.Container();
-        let y = random(0, -200);
 
         var bulletImage = 'bullet' + this.spriteNumber + '.gif';
         this.body = PIXI.Sprite.fromImage(bulletImage);
@@ -109,13 +109,12 @@
         bullet.addChild(this.body);
         bullet.landingPos = this.landingPositions[this.landingRandom];
         bullet.position.x = this.randomX;
-        bullet.position.y = y;
+        bullet.position.y = this.randomY;
         bullet.vy = speed * direction;
         bullet.rotated = false;
         bullet.isBaddie = this.spriteNumber >= 2 ? true : false; // bullet2.gif, bullet1.gif
         bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
         direction *= -1;
-
 
         this.game.stage.addChild(bullet);
         this.game.bulletArray.push(bullet);
@@ -123,22 +122,50 @@
 
       playSound() {
         this.sound = 'bullet' + this.spriteNumber + '.mp3';
-        this.notification = 'bullet' + this.spriteNumber + '.png';
-
-        console.log(this.sound);
         var audio = new Audio(this.sound);
-        //audio.play();
+        audio.play();
       }
+
       showNotification() {
+        let notificationBullet = new PIXI.Container();
+        var notificationImage = 'bullet' + this.spriteNumber + '.png';
+        let personX = this.game.person._container.x;
+        let personY = this.game.person._container.y - 35;
+        let speed = 1;
+        let directionN;
+      //  directionN *= 1;
 
+        notificationBullet.position.x = personX;
+        notificationBullet.position.y = personY;
+        this.notification = PIXI.Sprite.fromImage(notificationImage);
+        notificationBullet.addChild(this.notification);
+        this.game.stage.addChild(notificationBullet);
+
+        this.game.bulletNotificationArray.push(this.notification);
+        this.fadeNotification();
       }
 
-      remove(bullet) {
-        var index = GameStage.bulletArray.indexOf(bullet);
-        if (index > -1) {
-          GameStage.bulletArray.splice(index, 1);
+      fadeNotification() {
+        var _this = this;
+        //console.log(this.game.bulletNotificationArray);
+        if (this.game.bulletNotificationArray.length > 0) {
+          this.game.bulletNotificationArray.forEach(function(currentValue, index, arr) {
+              currentValue.position.y -= 1
+              if (currentValue.alpha <= 0) {
+                _this.remove(currentValue, GameStage.bulletNotificationArray);
+              } else {
+                currentValue.alpha -= 0.01;
+              }
+          });
         }
-        GameStage.stage.removeChild(bullet);
+      }
+
+      remove(item, arr) {
+        var index = arr.indexOf(item);
+        if (index > -1) {
+          arr.splice(index, 1);
+        }
+        GameStage.stage.removeChild(item);
       }
       rain() {
         GameStage.bulletArray.forEach(function(bullet) {
@@ -147,11 +174,11 @@
             var frameCount = Math.round(GameStage._lastFrameTime);
             //  new Tween(bullet, "rotation", -0.2, 10, true);
             if (frameCount % switchInterval == 0) {
-              GameStage.Bullets.remove(bullet);
+              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
               GameStage.addBullets();
             }
           } else if (bullet.position.y > GameStage.renderer.height) {
-            GameStage.Bullets.remove(bullet);
+            GameStage.Bullets.remove(bullet, GameStage.bulletArray);
             GameStage.addBullets();
           } else {
             bullet.position.y += 1
@@ -173,7 +200,7 @@
                 GameStage.hitPoints++;
               }
               GameStage.state._stateObj.update();
-              GameStage.Bullets.remove(bullet);
+              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
               GameStage.Bullets.playSound();
               GameStage.Bullets.showNotification();
               GameStage.addBullets();
@@ -306,6 +333,7 @@
       this.bulletArray = [];
       this.state = "";
       this.hitPoints = 1;
+      this.bulletNotificationArray = [];
       requestAnimationFrame(this._tick.bind(this));
     }
     addBg() {
@@ -337,9 +365,9 @@
     }
     clear() {
       console.log('cleared');
-      this.bulletArray = [];
       //Remove Everything in menu state
-      this.Bullets.remove();
+      //this.Bullets.remove(bullet, bulletArray);
+       this.bulletArray = [];
     }
     removePlayer() {
       this.person = null
@@ -363,6 +391,7 @@
       if (GameStage.state._state == "boot") {
         this.Bullets.rain();
         this.Bullets.testCollision();
+        this.Bullets.fadeNotification();
       }
     }
   }
