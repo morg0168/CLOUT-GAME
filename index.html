@@ -123,7 +123,7 @@
       playSound() {
         this.sound = 'bullet' + this.spriteNumber + '.mp3';
         var audio = new Audio(this.sound);
-        audio.play();
+        //audio.play();
       }
 
       showNotification() {
@@ -133,7 +133,6 @@
         let personY = this.game.person._container.y - 35;
         let speed = 1;
         let directionN;
-      //  directionN *= 1;
 
         notificationBullet.position.x = personX;
         notificationBullet.position.y = personY;
@@ -147,7 +146,6 @@
 
       fadeNotification() {
         var _this = this;
-        //console.log(this.game.bulletNotificationArray);
         if (this.game.bulletNotificationArray.length > 0) {
           this.game.bulletNotificationArray.forEach(function(currentValue, index, arr) {
               currentValue.position.y -= 1
@@ -159,7 +157,20 @@
           });
         }
       }
-
+     fadeBullets(item, arr) {
+        var _this = this;
+        var index = arr.indexOf(item);
+        var timer = setInterval(function() {
+          if (index > -1) {
+              if (item.alpha <= 0.2) {
+                 clearInterval(timer);
+                 _this.remove(item, arr);
+               } else {
+                  item.alpha -= 0.0 1;
+              }
+            }
+        }, 50);
+      }
       remove(item, arr) {
         var index = arr.indexOf(item);
         if (index > -1) {
@@ -172,9 +183,8 @@
           if ((bullet.position.y < GameStage.renderer.height) && bullet.position.y >= (GameStage.renderer.height - bullet.landingPos)) {
             var switchInterval = Math.round(random(2, 2000));
             var frameCount = Math.round(GameStage._lastFrameTime);
-            //  new Tween(bullet, "rotation", -0.2, 10, true);
-            if (frameCount % switchInterval == 0) {
-              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
+              if (frameCount % switchInterval == 0) {
+              GameStage.Bullets.fadeBullets(bullet, GameStage.bulletArray);
               GameStage.addBullets();
             }
           } else if (bullet.position.y > GameStage.renderer.height) {
@@ -200,9 +210,9 @@
                 GameStage.hitPoints++;
               }
               GameStage.state._stateObj.update();
-              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
               GameStage.Bullets.playSound();
               GameStage.Bullets.showNotification();
+              GameStage.Bullets.remove(bullet, GameStage.bulletArray);
               GameStage.addBullets();
             }
           }
