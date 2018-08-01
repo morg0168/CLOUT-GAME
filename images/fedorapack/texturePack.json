@@ -1,0 +1,255 @@
+{"frames": {
+
+"FedoraV001_SpriteSheet_01.png":
+{
+	"frame": {"x":0,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_02.png":
+{
+	"frame": {"x":200,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_03.png":
+{
+	"frame": {"x":400,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_04.png":
+{
+	"frame": {"x":600,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_05.png":
+{
+	"frame": {"x":800,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_06.png":
+{
+	"frame": {"x":1000,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_07.png":
+{
+	"frame": {"x":1200,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_08.png":
+{
+	"frame": {"x":1400,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_09.png":
+{
+	"frame": {"x":1600,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_10.png":
+{
+	"frame": {"x":1800,"y":0,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_11.png":
+{
+	"frame": {"x":0,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_12.png":
+{
+	"frame": {"x":200,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_13.png":
+{
+	"frame": {"x":400,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_14.png":
+{
+	"frame": {"x":600,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_15.png":
+{
+	"frame": {"x":800,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_16.png":
+{
+	"frame": {"x":1000,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_17.png":
+{
+	"frame": {"x":1200,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_18.png":
+{
+	"frame": {"x":1400,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_19.png":
+{
+	"frame": {"x":1600,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_20.png":
+{
+	"frame": {"x":1800,"y":83,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_21.png":
+{
+	"frame": {"x":0,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_22.png":
+{
+	"frame": {"x":200,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_23.png":
+{
+	"frame": {"x":400,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_24.png":
+{
+	"frame": {"x":600,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_25.png":
+{
+	"frame": {"x":800,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_26.png":
+{
+	"frame": {"x":1000,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_27.png":
+{
+	"frame": {"x":1200,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_28.png":
+{
+	"frame": {"x":1400,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_29.png":
+{
+	"frame": {"x":1600,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+},
+"FedoraV001_SpriteSheet_30.png":
+{
+	"frame": {"x":1800,"y":166,"w":200,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":83},
+	"sourceSize": {"w":200,"h":83}
+}},
+"animations": {
+	"FedoraV001_SpriteSheet": ["FedoraV001_SpriteSheet_01.png","FedoraV001_SpriteSheet_02.png","FedoraV001_SpriteSheet_03.png","FedoraV001_SpriteSheet_04.png","FedoraV001_SpriteSheet_05.png","FedoraV001_SpriteSheet_06.png","FedoraV001_SpriteSheet_07.png","FedoraV001_SpriteSheet_08.png","FedoraV001_SpriteSheet_09.png","FedoraV001_SpriteSheet_10.png","FedoraV001_SpriteSheet_11.png","FedoraV001_SpriteSheet_12.png","FedoraV001_SpriteSheet_13.png","FedoraV001_SpriteSheet_14.png","FedoraV001_SpriteSheet_15.png","FedoraV001_SpriteSheet_16.png","FedoraV001_SpriteSheet_17.png","FedoraV001_SpriteSheet_18.png","FedoraV001_SpriteSheet_19.png","FedoraV001_SpriteSheet_20.png","FedoraV001_SpriteSheet_21.png","FedoraV001_SpriteSheet_22.png","FedoraV001_SpriteSheet_23.png","FedoraV001_SpriteSheet_24.png","FedoraV001_SpriteSheet_25.png","FedoraV001_SpriteSheet_26.png","FedoraV001_SpriteSheet_27.png","FedoraV001_SpriteSheet_28.png","FedoraV001_SpriteSheet_29.png","FedoraV001_SpriteSheet_30.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "texturePack.png",
+	"format": "RGBA8888",
+	"size": {"w":2000,"h":249},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:a1e6cd9442602a06556c5d4e1c0fba2b:684d501ab3d308231a714ad20e53bd47:f26228ad0bf5c544c830f92246550b41$"
+}
+}

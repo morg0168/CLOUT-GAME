@@ -58,7 +58,7 @@
 
 <script>
   /* Viewport Width
-      /––––––––––––––––––––––––*/
+        /––––––––––––––––––––––––*/
   var $vpWidth = jQuery(window).width();
 
   /* Touch Device
@@ -173,7 +173,9 @@
       this.speed = 0;
       this.landingPositions = [35, 65];
       this.body = null;
-      this.spriteNumber = random(1, 4);
+      //1 - 4 inclusive is goodie
+      //5 - 10 inclusive is baddie
+      this.spriteNumber = random(1, 11); // 1, 2, 3.. 10
       this.landingRandom = random(0, 3);
       this.randomX = random(0, GameStage.renderer.width);
       this.randomY = random(0, -200);
@@ -187,23 +189,62 @@
         speed = 2,
         direction = 1;
       let x = spacing + xOffset;
-      let bullet = new PIXI.Container();
+      var frames = [];
 
-      var bulletImage = 'bullet' + this.spriteNumber + '.gif';
-      this.body = PIXI.Sprite.fromImage(bulletImage);
-      this.body.scale.x = 0.2;
-      this.body.scale.y = 0.2;
+      switch (this.spriteNumber) {
+        case 1: //Coin Goodie
+          for (var i = 1; i < 48; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('CloutCoinV001_SpriteSheet_' + val + '.png'));
+          }
+          break;
+        case 2:
+          for (var i = 1; i < 48; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('CloutCoinV001_SpriteSheet_' + val + '.png'));
+          }
+          break;
+        case 3:
+          for (var i = 1; i < 48; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('CloutCoinV001_SpriteSheet_' + val + '.png'));
+          }
+          break;
+        case 4:
+          for (var i = 1; i < 48; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('CloutCoinV001_SpriteSheet_' + val + '.png'));
+          }
+          break;
+        case 5: //Fedora Baddie
+          for (var i = 1; i < 30; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('FedoraV001_SpriteSheet_' + val + '.png'));
+          }
+          break;
+        default:
+          for (var i = 1; i < 30; i++) {
+            var val = i < 10 ? '0' + i : i;
+            frames.push(PIXI.Texture.fromFrame('FedoraV001_SpriteSheet_' + val + '.png'));
+          }
 
-      bullet.addChild(this.body);
+      }
+
+
+
+      var bullet = new PIXI.extras.AnimatedSprite(frames);
+      bullet.animationSpeed = 0.5;
+      bullet.play();
+      bullet.scale.y = 0.2;
+      bullet.scale.x = 0.2;
       bullet.landingPos = this.landingPositions[this.landingRandom];
       bullet.position.x = this.randomX;
       bullet.position.y = this.randomY;
       bullet.vy = speed * direction;
       bullet.rotated = false;
-      bullet.isBaddie = this.spriteNumber >= 2 ? true : false; // bullet2.gif, bullet1.gif
-      bullet.isGoodie = this.spriteNumber <= 1 ? true : false;
       direction *= -1;
-
+      bullet.isBaddie = this.spriteNumber >= 5 ? true : false;
+      bullet.isGoodie = this.spriteNumber <= 4 ? true : false;
       this.game.stage.addChild(bullet);
       this.game.bulletArray.push(bullet);
     }
@@ -286,7 +327,6 @@
     testCollision() {
       GameStage.bulletArray.forEach(function(bullet) {
         if (GameStage.state.state !== "load") {
-          //  console.log(bullet);
           if (hitTestRectangle(bullet, GameStage.person._container)) {
             if (bullet.isBaddie == true) {
               console.log('baddie');
@@ -437,6 +477,7 @@
       this.controlsArray = [];
       requestAnimationFrame(this._tick.bind(this));
     }
+    //could move into Object Literal preload bootstate
     addBg() {
       var stageBg = new PIXI.Sprite(PIXI.Texture.WHITE);
       stageBg.width = 300;
@@ -453,6 +494,7 @@
       bg.scale.y = 1;
       this.stage.addChild(bg);
     }
+    //Instantiate objects/Classes and attach to parent GameStage object
     addBullets() {
       var x = 0;
       var y = 0;
@@ -573,8 +615,9 @@
         .add('baddie2.gif')
         .add('baddie3.gif')
         .add('end.png')
+        .add('images/coinpack/texturePack.json')
+        .add('images/fedorapack/texturePack.json')
         .load(this.create);
-      //  this.create();
     },
     create: function() {
       GameStage.addBg();
@@ -734,4 +777,8 @@
   let GameStage = new Game(document.body);
   GameStage.addState();
   GameStage.state.add("menu", menuState);
+
+  this.PIXI.ticker.shared.add(function() {
+    //console.log('test');
+  });
 </script>
