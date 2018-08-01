@@ -243,7 +243,7 @@
       bullet.vy = speed * direction;
       bullet.rotated = false;
       direction *= -1;
-      bullet.isBaddie = this.spriteNumber >= 5 ? true : false;
+      bullet.isBaddie = this.spriteNumber >= 5 ? true : false; // bullet2.gif, bullet1.gif
       bullet.isGoodie = this.spriteNumber <= 4 ? true : false;
       this.game.stage.addChild(bullet);
       this.game.bulletArray.push(bullet);
@@ -327,6 +327,7 @@
     testCollision() {
       GameStage.bulletArray.forEach(function(bullet) {
         if (GameStage.state.state !== "load") {
+          //  console.log(bullet);
           if (hitTestRectangle(bullet, GameStage.person._container)) {
             if (bullet.isBaddie == true) {
               console.log('baddie');
