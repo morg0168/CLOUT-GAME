@@ -460,6 +460,57 @@
       this._game.stage.removeChild(this._container);
     }
   }
+
+  class Health {
+    constructor() {
+      this.healthContainer = new PIXI.Container(),
+      this.healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
+        display: 'block',
+        width: '100%',
+        font: 'bold 15px Arial',
+        fill: '#ffffff',
+        align: 'center',
+        strokeThickness: 1
+      })
+    }
+    createText() {
+      this.healthContainer.addChild(this.healthText);
+      GameStage.stage.addChild(this.healthContainer);
+    }
+    updateText() {
+      this.healthText.setText('Clout: ' + GameStage.hitPoints);
+    }
+  }
+  class Background {
+    constructor() {
+      this.background = GameStage.state._stateObj.background;
+      this.bg = {};
+      this.bg.anchor = 0.5;
+      this.bg.x = GameStage.renderer.view.width / 2;
+      this.bg.y =  GameStage.renderer.view.height / 4;
+      this.bg.scale = 1;
+      this.bg.width = 300;
+      this.bg.height = 185;
+      this.bg.zOrder = GameStage.state._stateObj.zOrder;
+    }
+    createBackground() {
+      if (this.background !== undefined && this.background !== null && typeof this.background == "string") {
+        this.bg = new PIXI.Sprite.fromImage(this.background);
+      } else {
+        this.background.width = 300;
+        this.background.height = 185;
+        this.background.zOrder = GameStage.state._stateObj.zOrder;
+        this.bg = this.background;
+      }
+      GameStage.stage.addChild(this.bg);
+
+      if (GameStage.state._stateObj.container && GameStage.state._stateObj.container !== null) {
+        GameStage.stage.addChild(GameStage.state._stateObj.container);
+        GameStage.state._stateObj.container.zOrder = 2;
+      }
+      GameStage.stage.children.sort((a, b) => a.zOrder - b.zOrder);
+    }
+  }
   //GAME
   //
   //class Game extends EventEmitter{
@@ -469,6 +520,8 @@
       this.person = null;
       this.Bullets = null;
       this.Controls = null;
+      this.Health = null;
+      this.Background = null;
       this.stage = new PIXI.Container();
       this.renderer = PIXI.autoDetectRenderer(300, 370); //old h 185
       this._element.appendChild(this.renderer.view);
@@ -478,48 +531,17 @@
       this.hitPoints = 1;
       this.bulletNotificationArray = [];
       this.controlsArray = [];
-      this.backgroundsArray = [];
       requestAnimationFrame(this._tick.bind(this));
     }
     //CREATE NEW CLASSES FOR HEALTH AND BG
     addHealth() {
-      let healthContainer = new PIXI.Container();
-      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
-        display: 'block',
-        width: '100%',
-        font: 'bold 15px Arial',
-        fill: '#ffffff',
-        align: 'center',
-        strokeThickness: 1
-      });
-      healthContainer.addChild(healthText);
-      GameStage.stage.addChild(healthContainer);
-      //healthContainerIndex = GameStage.stage.children.indexOf(healthContainer);
+      this.Health = new Health();
+      this.Health.createText();
     }
 
     addBg() {
-      //  console.log(this.stage.children[0]);
-      var background = GameStage.state._stateObj.background;
-      if (background !== undefined && background !== null && typeof background == "string") {
-        var bg = new PIXI.Sprite.fromImage(background);
-      } else {
-        var bg = background;
-      }
-      bg.anchor.set(0.5);
-      bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 4);
-      bg.scale.x = 1;
-      bg.scale.y = 1;
-      bg.width = 300;
-      bg.height = 185;
-      bg.zOrder = GameStage.state._stateObj.zOrder;
-
-      this.stage.addChild(bg);
-
-      if (GameStage.state._stateObj.container && GameStage.state._stateObj.container !== null) {
-        GameStage.stage.addChild(GameStage.state._stateObj.container);
-        GameStage.state._stateObj.container.zOrder = 2;
-      }
-      this.stage.children.sort((a, b) => a.zOrder - b.zOrder);
+      this.Background = new Background();
+      this.Background.createBackground();
     }
     //Instantiate objects/Classes and attach to parent GameStage object
     addBullets() {
@@ -586,13 +608,11 @@
   }
 
   //  STATES
-  var healthContainerIndex = 0;
-  var healthText;
   var menuState = {
     playing: false,
     background: new PIXI.Sprite(PIXI.Texture.WHITE),
     container: new PIXI.Container(),
-    zOrder: 1,
+    zOrder: 1, //1 - 4
     preload: function() {
       this.create();
     },
@@ -626,7 +646,7 @@
   var bootState = {
     playing: true,
     background: 'Landscape.png',
-    zOrder: 5,
+    zOrder: 5, //5 - 9
     preload: function() {
       //Load assets
       PIXI.loader
@@ -653,7 +673,7 @@
       GameStage.addHealth();
     },
     update: function(hitPoints) {
-      healthText.setText('Clout: ' + GameStage.hitPoints);
+      GameStage.Health.updateText();
 
       if (GameStage.hitPoints <= 0) {
         GameStage.state.add("loose", looseState);
@@ -669,7 +689,7 @@
   var boot2State = {
     playing: true,
     background: new PIXI.Sprite(PIXI.Texture.WHITE),
-    zOrder: 10,
+    zOrder: 10, //10 - 19
     preload: function() {
       this.create();
     },
@@ -678,7 +698,7 @@
       GameStage.addHealth();
     },
     update: function(hitPoints) {
-      healthText.setText('Clout: ' + GameStage.hitPoints);
+      GameStage.Health.updateText();
 
       if (GameStage.hitPoints <= 0) {
         GameStage.state.add("loose", looseState);
