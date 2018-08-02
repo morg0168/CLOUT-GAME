@@ -58,7 +58,7 @@
 
 <script>
   /* Viewport Width
-        /––––––––––––––––––––––––*/
+          /––––––––––––––––––––––––*/
   var $vpWidth = jQuery(window).width();
 
   /* Touch Device
@@ -181,6 +181,7 @@
       this.randomY = random(0, -200);
       this.sound = "";
       this.notification = null;
+      this.zOrder = 21;
     }
     render() {
       let numberOfBullets = 6,
@@ -367,6 +368,7 @@
       this._container.height = this._body.height;
       this._originalY = this._container.position.y;
       this.frames = [];
+      this._container.zOrder = 12;
     }
 
     moveLeft() {
@@ -476,24 +478,48 @@
       this.hitPoints = 1;
       this.bulletNotificationArray = [];
       this.controlsArray = [];
+      this.backgroundsArray = [];
       requestAnimationFrame(this._tick.bind(this));
     }
-    //could move into Object Literal preload bootstate
-    addBg() {
-      var stageBg = new PIXI.Sprite(PIXI.Texture.WHITE);
-      stageBg.width = 300;
-      stageBg.height = 370;
-      stageBg.anchor.set(0.5);
-      stageBg.tint = "#0x284fff";
-      stageBg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 2);
-      this.stage.addChild(stageBg);
+    //CREATE NEW CLASSES FOR HEALTH AND BG
+    addHealth() {
+      let healthContainer = new PIXI.Container();
+      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
+        display: 'block',
+        width: '100%',
+        font: 'bold 15px Arial',
+        fill: '#ffffff',
+        align: 'center',
+        strokeThickness: 1
+      });
+      healthContainer.addChild(healthText);
+      GameStage.stage.addChild(healthContainer);
+      //healthContainerIndex = GameStage.stage.children.indexOf(healthContainer);
+    }
 
-      var bg = new PIXI.Sprite.fromImage('Landscape.png');
+    addBg() {
+      //  console.log(this.stage.children[0]);
+      var background = GameStage.state._stateObj.background;
+      if (background !== undefined && background !== null && typeof background == "string") {
+        var bg = new PIXI.Sprite.fromImage(background);
+      } else {
+        var bg = background;
+      }
       bg.anchor.set(0.5);
       bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 4);
       bg.scale.x = 1;
       bg.scale.y = 1;
+      bg.width = 300;
+      bg.height = 185;
+      bg.zOrder = GameStage.state._stateObj.zOrder;
+
       this.stage.addChild(bg);
+
+      if (GameStage.state._stateObj.container && GameStage.state._stateObj.container !== null) {
+        GameStage.stage.addChild(GameStage.state._stateObj.container);
+        GameStage.state._stateObj.container.zOrder = 2;
+      }
+      this.stage.children.sort((a, b) => a.zOrder - b.zOrder);
     }
     //Instantiate objects/Classes and attach to parent GameStage object
     addBullets() {
@@ -551,7 +577,7 @@
       this.renderer.render(this.stage);
       Tween.runTweens();
       requestAnimationFrame(this._tick.bind(this));
-      if (GameStage.state._state == "boot") {
+      if (GameStage.state._stateObj.playing == true && this.Bullets != undefined) {
         this.Bullets.rain();
         this.Bullets.testCollision();
         this.Bullets.fadeNotification();
@@ -563,19 +589,16 @@
   var healthContainerIndex = 0;
   var healthText;
   var menuState = {
+    playing: false,
+    background: new PIXI.Sprite(PIXI.Texture.WHITE),
+    container: new PIXI.Container(),
+    zOrder: 1,
     preload: function() {
       this.create();
     },
     create: function() {
-      var bg = new PIXI.Sprite(PIXI.Texture.WHITE);
-      bg.anchor.set(0.5);
-      bg.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 4);
-      bg.scale.x = 300;
-      bg.height = 185;
-      GameStage.stage.addChild(bg);
-
-      //START GAME BUTTONfch
-      let container = new PIXI.Container();
+      var _this = this;
+      //START GAME BUTTON
       let restartButton = new PIXI.Sprite.fromImage('end.png');
       restartButton.anchor.set(0.5);
       restartButton.interactive = true;
@@ -583,16 +606,15 @@
       restartButton.scale.x = 0.1;
       restartButton.scale.y = 0.1;
       restartButton.alpha = 1;
-      container.addChild(restartButton);
+      _this.container.addChild(restartButton);
       var playText = new PIXI.Text('u cant win. \n just try and stay \n relevant', {
         font: 'bold 15px Arial',
         fill: '#000',
         align: 'center',
         strokeThickness: 1
       });
-      container.addChild(playText);
-      GameStage.stage.addChild(container);
-      var _this = this;
+      _this.container.addChild(playText);
+      GameStage.addBg();
       restartButton.on('pointerdown', function(e) {
         _this.update();
       });
@@ -602,6 +624,9 @@
     }
   }
   var bootState = {
+    playing: true,
+    background: 'Landscape.png',
+    zOrder: 5,
     preload: function() {
       //Load assets
       PIXI.loader
@@ -625,18 +650,7 @@
       GameStage.addPerson();
       GameStage.addControls();
       GameStage.addBullets();
-      let healthContainer = new PIXI.Container();
-      healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
-        display: 'block',
-        width: '100%',
-        font: 'bold 15px Arial',
-        fill: '#ffffff',
-        align: 'center',
-        strokeThickness: 1
-      });
-      healthContainer.addChild(healthText);
-      GameStage.stage.addChild(healthContainer);
-      healthContainerIndex = GameStage.stage.children.indexOf(healthContainer);
+      GameStage.addHealth();
     },
     update: function(hitPoints) {
       healthText.setText('Clout: ' + GameStage.hitPoints);
@@ -644,12 +658,41 @@
       if (GameStage.hitPoints <= 0) {
         GameStage.state.add("loose", looseState);
       } else {
-        //GameStage.state.add("win", winState);
+        if (GameStage.hitPoints == 2) {
+          GameStage.state.add("boot2", boot2State);
+        }
       }
 
     }
   }
+
+  var boot2State = {
+    playing: true,
+    background: new PIXI.Sprite(PIXI.Texture.WHITE),
+    zOrder: 10,
+    preload: function() {
+      this.create();
+    },
+    create: function() {
+      GameStage.addBg();
+      GameStage.addHealth();
+    },
+    update: function(hitPoints) {
+      healthText.setText('Clout: ' + GameStage.hitPoints);
+
+      if (GameStage.hitPoints <= 0) {
+        GameStage.state.add("loose", looseState);
+      } else {
+        if (GameStage.hitPoints == 6) {
+          alert('next state, final boss level');
+        }
+      }
+    }
+  }
+
   var looseState = {
+    playing: false,
+    zOrder: 19,
     create: function() {
       let container = new PIXI.Container();
       let endImg = new PIXI.Sprite.fromImage('end.png');
