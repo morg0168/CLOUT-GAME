@@ -58,7 +58,7 @@
 
 <script>
   /* Viewport Width
-          /––––––––––––––––––––––––*/
+            /––––––––––––––––––––––––*/
   var $vpWidth = jQuery(window).width();
 
   /* Touch Device
@@ -464,14 +464,14 @@
   class Health {
     constructor() {
       this.healthContainer = new PIXI.Container(),
-      this.healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
-        display: 'block',
-        width: '100%',
-        font: 'bold 15px Arial',
-        fill: '#ffffff',
-        align: 'center',
-        strokeThickness: 1
-      })
+        this.healthText = new PIXI.Text('Clout: ' + GameStage.hitPoints, {
+          display: 'block',
+          width: '100%',
+          font: 'bold 15px Arial',
+          fill: '#ffffff',
+          align: 'center',
+          strokeThickness: 1
+        })
     }
     createText() {
       this.healthContainer.addChild(this.healthText);
@@ -487,7 +487,7 @@
       this.bg = {};
       this.bg.anchor = 0.5;
       this.bg.x = GameStage.renderer.view.width / 2;
-      this.bg.y =  GameStage.renderer.view.height / 4;
+      this.bg.y = GameStage.renderer.view.height / 4;
       this.bg.scale = 1;
       this.bg.width = 300;
       this.bg.height = 185;
@@ -610,7 +610,7 @@
   //  STATES
   var menuState = {
     playing: false,
-    background: new PIXI.Sprite(PIXI.Texture.WHITE),
+    background: 'Title.png',
     container: new PIXI.Container(),
     zOrder: 1, //1 - 4
     preload: function() {
@@ -619,12 +619,12 @@
     create: function() {
       var _this = this;
       //START GAME BUTTON
-      let restartButton = new PIXI.Sprite.fromImage('end.png');
+      let restartButton = new PIXI.Sprite.fromImage('Start.png');
       restartButton.anchor.set(0.5);
       restartButton.interactive = true;
-      restartButton.position.set(GameStage.renderer.view.width / 2, GameStage.renderer.view.height / 4);
-      restartButton.scale.x = 0.1;
-      restartButton.scale.y = 0.1;
+      restartButton.position.set(GameStage.renderer.view.width - 50, GameStage.renderer.view.height / 2 - 25);
+      // restartButton.scale.x = 0.1;
+      // restartButton.scale.y = 0.1;
       restartButton.alpha = 1;
       _this.container.addChild(restartButton);
       var playText = new PIXI.Text('u cant win. \n just try and stay \n relevant', {
@@ -633,7 +633,7 @@
         align: 'center',
         strokeThickness: 1
       });
-      _this.container.addChild(playText);
+    //  _this.container.addChild(playText);
       GameStage.addBg();
       restartButton.on('pointerdown', function(e) {
         _this.update();
@@ -678,7 +678,7 @@
       if (GameStage.hitPoints <= 0) {
         GameStage.state.add("loose", looseState);
       } else {
-        if (GameStage.hitPoints == 2) {
+        if (GameStage.hitPoints == 10) {
           GameStage.state.add("boot2", boot2State);
         }
       }
@@ -703,7 +703,7 @@
       if (GameStage.hitPoints <= 0) {
         GameStage.state.add("loose", looseState);
       } else {
-        if (GameStage.hitPoints == 6) {
+        if (GameStage.hitPoints == 20) {
           alert('next state, final boss level');
         }
       }
@@ -781,8 +781,6 @@
       GameStage.state._stateObj.preload();
     }
   }
-
-
 
   //HELPER COLLISION DETECTION FUNCTION
   function hitTestRectangle(r1, r2) {
